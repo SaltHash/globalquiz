@@ -70,7 +70,7 @@
 		input:checked + .slider:before { transform: translateX(20px); }
 
 		/* ── Navbar ── */
-		nav, .question-card, .leaderboard-section {
+		nav, .question-card, .leaderboard-section, .modal {
 		    backdrop-filter: var(--blur-val) !important;
 		    -webkit-backdrop-filter: var(--blur-val) !important;
 		}
@@ -291,6 +291,42 @@
 		.results-container { text-align: center; }
 		.results-score { font-size: 3rem; font-weight: 700; margin: 2rem 0; }
 		.results-details { font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 2rem; }
+		.results-actions {
+			display: flex;
+			flex-direction: column;
+			gap: 0.75rem;
+			align-items: stretch;
+		}
+		.review-container {
+			margin-top: 1.5rem;
+			text-align: left;
+		}
+		.review-list {
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+		}
+		.review-item {
+			background: var(--card-bg);
+			border: 1px solid var(--card-border);
+			border-radius: 10px;
+			padding: 1rem;
+		}
+		.review-question-title {
+			font-weight: 700;
+			margin-bottom: 0.75rem;
+		}
+		.review-answer-row {
+			padding: 0.5rem 0;
+			border-top: 1px solid var(--card-border);
+		}
+		.review-answer-row:first-of-type {
+			border-top: none;
+			padding-top: 0;
+		}
+		.review-label { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.2rem; }
+		.review-user-answer { color: var(--incorrect); }
+		.review-correct-answer { color: var(--correct); }
 
 		/* ── Submit Score Modal ── */
 		.modal-backdrop {
@@ -513,12 +549,18 @@
 						<button class="filter-btn" data-n="38" onclick="setLbFilterResults(38, this)">All</button>
 					</div>
 				</div>
-				<div id="topScoresResults"><div class="lb-loading">Loading…</div></div>
+			<div id="topScoresResults"><div class="lb-loading">Loading…</div></div>
 			</div>
 
-			<button class="submit-button" onclick="openModal()" id="openModalBtn">Submit Score</button>
-			<br>
-			<button class="retry-button" onclick="location.reload()">Take Quiz Again</button>
+			<div class="results-actions">
+				<button class="submit-button" onclick="openModal()" id="openModalBtn">Submit Score</button>
+				<button class="retry-button" id="reviewAnswersBtn" onclick="toggleReviewAnswers()">Review Wrong Answers</button>
+				<button class="retry-button" onclick="location.reload()">Take Quiz Again</button>
+			</div>
+
+			<div id="reviewContainer" class="review-container hidden">
+				<div class="review-list" id="reviewList"></div>
+			</div>
 		</div>
 	</div>
 </main>
@@ -552,6 +594,7 @@ let lbFilterCount   = 10;
 let lbFilterCountResults = 10;
 let startTime, timerInterval;
 let pendingScore = null;
+let pendingReview = [];
 
 // ── Question count ────────────────────────────────────────────────────
 function setQuestionCount(val, btn) {
@@ -738,29 +781,97 @@ function collectAnswers() {
 
 function gradeQuiz(answers) {
 	let correct = 0, total = 0;
+	const wrongAnswers = [];
 	activeQuestions.forEach((q, qi) => {
+		const wrongParts = [];
 		q.answers.forEach((a, ai) => {
 			total++;
 			const ua = answers[qi]?.[ai];
+			let isCorrect = false;
+			let correctText = '';
 			if (a.type === 'text-input') {
 				const acceptable = Array.isArray(a.correct)
 					? a.correct.map(x => x.toLowerCase())
 					: [a.correct.toLowerCase()];
-				if (ua && acceptable.includes(ua)) correct++;
+				isCorrect = !!(ua && acceptable.includes(ua));
+				correctText = Array.isArray(a.correct) ? a.correct.join(' / ') : a.correct;
 			} else if (a.type === 'text-mc' || a.type === 'image-mc') {
-				if (ua === a.correct) correct++;
+				isCorrect = ua === a.correct;
+				correctText = a.correct;
+			}
+
+			if (isCorrect) {
+				correct++;
+			} else {
+				wrongParts.push({
+					label: a.label || `Answer ${ai + 1}`,
+					userAnswer: ua || 'No answer',
+					correctAnswer: correctText
+				});
 			}
 		});
+
+		if (wrongParts.length) {
+			wrongAnswers.push({
+				questionNumber: qi + 1,
+				questionText: q.question,
+				image: q.image,
+				wrongParts
+			});
+		}
 	});
-	return { correct, total };
+	return { correct, total, wrongAnswers };
+}
+
+function renderReviewAnswers() {
+	const list = document.getElementById('reviewList');
+	if (!pendingReview.length) {
+		list.innerHTML = '<div class="review-item">Perfect score — no incorrect answers to review.</div>';
+		return;
+	}
+
+	list.innerHTML = pendingReview.map(item => {
+		const rows = item.wrongParts.map(part => `
+			<div class="review-answer-row">
+				<div class="review-label">${escapeHtml(part.label)}</div>
+				<div class="review-user-answer">Your answer: ${escapeHtml(part.userAnswer)}</div>
+				<div class="review-correct-answer">Correct answer: ${escapeHtml(part.correctAnswer)}</div>
+			</div>
+		`).join('');
+
+		const imageHtml = item.image ? `<img src="${item.image}" alt="Question reference" class="question-image">` : '';
+
+		return `
+			<div class="review-item">
+				<div class="review-question-title">Question ${item.questionNumber}: ${escapeHtml(item.questionText)}</div>
+				${imageHtml}
+				${rows}
+			</div>
+		`;
+	}).join('');
+}
+
+function toggleReviewAnswers() {
+	const reviewContainer = document.getElementById('reviewContainer');
+	const reviewBtn = document.getElementById('reviewAnswersBtn');
+	const isHidden = reviewContainer.classList.contains('hidden');
+	if (isHidden) {
+		renderReviewAnswers();
+		reviewContainer.classList.remove('hidden');
+		reviewBtn.textContent = 'Hide Review';
+	} else {
+		reviewContainer.classList.add('hidden');
+		reviewBtn.textContent = 'Review Wrong Answers';
+	}
 }
 
 // ── Submit quiz ───────────────────────────────────────────────────────
 document.getElementById('submitQuiz').addEventListener('click', function() {
 	stopTimer();
 	const answers    = collectAnswers();
-	const { correct, total } = gradeQuiz(answers);
+	const { correct, total, wrongAnswers } = gradeQuiz(answers);
 	const timeSpent  = getElapsedTime();
+	pendingReview = wrongAnswers;
 
 	pendingScore = { correct, total, timeSpent, numQuestions: selectedCount };
 
@@ -768,6 +879,8 @@ document.getElementById('submitQuiz').addEventListener('click', function() {
 	document.getElementById('resultsContainer').classList.remove('hidden');
 	document.getElementById('finalScore').textContent = `${correct}/${total}`;
 	document.getElementById('resultsDetails').textContent = `Time: ${formatTime(timeSpent)}`;
+	document.getElementById('reviewContainer').classList.add('hidden');
+	document.getElementById('reviewAnswersBtn').textContent = 'Review Wrong Answers';
 
 	// sync results leaderboard filter to the count used
 	const matchN = selectedCount === quizData.length ? 38 : selectedCount;
