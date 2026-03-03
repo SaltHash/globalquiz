@@ -45,11 +45,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This painting was the first use of watercolor in European art and influenced Dutch landscape painting for centuries.",
-					"One of the earliest and most complex uses of oil paint in Northern Europe, showcasing mastery of light, texture, and realistic detail with a convex mirror demonstrating technical innovation.",
-					"A monumental marble sculpture that redefined the representation of the male nude as a symbol of civic virtue.",
-					"This work introduced the technique of chiaroscuro to create spiritual devotion during the Counter-Reformation.",
-					"A scientific drawing that perfectly encapsulates Renaissance ideals of human proportion and interdisciplinary genius."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"One of the earliest and most complex uses of oil paint in Northern Europe, showcasing mastery of light, texture, and realistic detail with a convex mirror demonstrating technical innovation.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'One of the earliest and most complex uses of oil paint in Northern Europe, showcasing mastery of light, texture, and realistic detail with a convex mirror demonstrating technical innovation.'
 			},
@@ -80,11 +80,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This radical proto-Cubist work shattered centuries of pictorial tradition by depicting distorted figures influenced by African masks and Iberian sculpture.",
-					"Painted to commemorate a 19th-century revolution, this work unites classical allegory with contemporary political reality as a symbol of popular struggle.",
-					"A landmark of Italian Renaissance art among the first large-scale paintings since antiquity to depict a pagan goddess, reflecting the Medici court's embrace of Neoplatonism and classical mythology.",
-					"This elongated bronze figure embodies postwar Existentialist spirit and human dignity in the face of destruction.",
-					"An anguished figure beneath a blood-red sky expressing psychological alienation amid rapid industrialization and social change."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"A landmark of Italian Renaissance art among the first large-scale paintings since antiquity to depict a pagan goddess, reflecting the Medici court's embrace of Neoplatonism and classical mythology.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'A landmark of Italian Renaissance art among the first large-scale paintings since antiquity to depict a pagan goddess, reflecting the Medici court\'s embrace of Neoplatonism and classical mythology.'
 			},
@@ -115,11 +115,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This ballet scene captures the rigorous labor behind Parisian entertainment and offers subtle commentary on gender and class during the Belle Époque.",
-					"This drawing perfectly encapsulates the Renaissance ideal of humanity as the measure of all things, combining art and science to explore ideal human proportions.",
-					"This monochromatic Cubist painting depicts the suffering caused by aerial warfare and became the most powerful anti-war artwork of the 20th century.",
-					"This hazy depiction of a port gave the Impressionist movement its name and represented a revolutionary break from academic painting.",
-					"This seascape used Romantic expressiveness to make a moral argument against the slave trade drawing on the real-life Zong massacre."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"This drawing perfectly encapsulates the Renaissance ideal of humanity as the measure of all things, combining art and science to explore ideal human proportions.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'This drawing perfectly encapsulates the Renaissance ideal of humanity as the measure of all things, combining art and science to explore ideal human proportions.'
 			},
@@ -150,11 +150,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"A nightmarish scene of violence and torture reflecting the trauma and moral collapse of Weimar Germany's birth after World War I.",
-					"A revolutionary mural using perspective and psychological realism to depict Christ announcing his betrayal with individualized emotional reactions among apostles.",
-					"A marble sculpture displaying unprecedented technical skill and emotional depth depicting Mary cradling Christ's body with serene tenderness.",
-					"An iconic frontal portrait projecting overwhelming royal authority and establishing the standard for state portraiture across Europe.",
-					"A dynamic mythological scene showcasing revolutionary use of color and movement drawn from classical texts by Ovid and Catullus."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"A revolutionary mural using perspective and psychological realism to depict Christ announcing his betrayal with individualized emotional reactions among apostles.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'A revolutionary mural using perspective and psychological realism to depict Christ announcing his betrayal with individualized emotional reactions among apostles.'
 			},
@@ -185,11 +185,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This group portrait of surgeons witnessing a dissection reflects the Dutch Golden Age's enthusiasm for empirical inquiry and scientific learning.",
-					"This intense biblical scene uses extreme contrasts of light and dark to give visceral realism to Counter-Reformation art intended to move viewers emotionally toward faith.",
-					"Carved when Michelangelo was only 24, this marble sculpture displayed unprecedented technical skill and emotional depth synthesizing Renaissance ideals of beauty with religious devotion.",
-					"This intimate domestic scene captures a quiet moment of everyday life suffused with subtle luminous light reflecting Dutch Golden Age values.",
-					"This monumental marble statue redefined the representation of the male nude as a symbol of intellectual courage and Florentine civic virtue."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"Carved when Michelangelo was only 24, this marble sculpture displayed unprecedented technical skill and emotional depth synthesizing Renaissance ideals of beauty with religious devotion.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'Carved when Michelangelo was only 24, this marble sculpture displayed unprecedented technical skill and emotional depth synthesizing Renaissance ideals of beauty with religious devotion.'
 			},
@@ -220,13 +220,13 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This tronie character study exemplifies mastery of light and reflects how the Dutch art market for private collectors drove artistic innovation.",
-					"This monumental marble statue redefined the representation of the male nude depicting David in tense anticipation embodying intellectual courage and serving as a symbol of Florentine republican independence.",
-					"This ancient subject painted on the eve of the French Revolution was widely read as a critique of corruption and a call for civic virtue.",
-					"This harrowing scene depicts execution of Spanish civilians with unprecedented emotional rawness becoming one of history's most powerful anti-war images.",
-					"This breathtaking sculptural group set within a theatrical frame depicts the mystical vision of a Counter-Reformation saint with intense spiritual rapture."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"This monumental marble statue redefined the representation of the male nude by depicting a biblical hero in tense anticipation, embodying intellectual courage and symbolizing Florentine republican independence.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
-				correct: 'This monumental marble statue redefined the representation of the male nude depicting David in tense anticipation embodying intellectual courage and serving as a symbol of Florentine republican independence.'
+				correct: 'This monumental marble statue redefined the representation of the male nude by depicting a biblical hero in tense anticipation, embodying intellectual courage and symbolizing Florentine republican independence.'
 			},
 		]
 	},
@@ -255,11 +255,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This vibrant sun-drenched scene of Parisians dining captures the leisure culture and social freedoms of the Third Republic's prosperous years during La Belle Époque.",
-					"This Surrealist canvas depicts melting watches in a dreamlike landscape drawing on Freudian ideas to subvert rational understandings of time and reality.",
-					"The centerpiece of the Sistine Chapel ceiling depicting the moment God breathes life into Adam with nearly touching fingers becoming one of the most iconic images in Western art.",
-					"This small bronze figure with its melting forms became the masterpiece of Post-Impressionism reflecting the movement's turn toward subjective inner experience.",
-					"This group portrait of militiamen celebrates with dynamic composition the pride and prosperity of Amsterdam's merchant republic during the Golden Age."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"The centerpiece of the Sistine Chapel ceiling depicting the moment God breathes life into Adam with nearly touching fingers becoming one of the most iconic images in Western art.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'The centerpiece of the Sistine Chapel ceiling depicting the moment God breathes life into Adam with nearly touching fingers becoming one of the most iconic images in Western art.'
 			},
@@ -290,11 +290,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This large Color Field canvas with luminous hovering rectangles was intended to evoke profound religious emotional experiences and became central to Abstract Expressionism during the Cold War.",
-					"Painted for the Vatican depicting ancient philosophers gathered with Plato and Aristotle at the center celebrating the Renaissance recovery of classical learning and the compatibility of philosophy and Christian truth.",
-					"This oval composition with a disorienting mirror reflection observes modern Parisian commercial culture and the commodification of women's labor in Belle Époque entertainment.",
-					"This small hazy depiction of a port was mocked by a critic whose title the artists adopted proudly announcing a new era in subjective perception over objective reality.",
-					"This stiffly posed scene of bourgeois Parisians enjoying a Sunday outing subtly satirizes social rigidity while demonstrating scientific Pointillist technique."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"Painted for the Vatican depicting ancient philosophers gathered with Plato and Aristotle at the center celebrating the Renaissance recovery of classical learning and the compatibility of philosophy and Christian truth.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'Painted for the Vatican depicting ancient philosophers gathered with Plato and Aristotle at the center celebrating the Renaissance recovery of classical learning and the compatibility of philosophy and Christian truth.'
 			},
@@ -325,11 +325,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This dynamic mythological scene showcases revolutionary use of color and movement drawn from classical texts exemplifying Italian Renaissance embrace of pagan mythology as worthy of serious artistic treatment.",
-					"This portrait painted as a betrothal gift shows a woman Henry VIII found less attractive in person than in the flattering portrait leading to annulment after six months.",
-					"This elongated emaciated bronze figure embodies postwar Existentialist spirit and suggests both survival and irreducible human dignity in the face of destruction.",
-					"This intimate domestic scene of a woman with a water jug is typical of capturing quiet everyday moments suffused with subtle luminous light.",
-					"This iconic frontal portrait projects overwhelming royal authority and became the definitive visual representation of Tudor power and state portraiture across Europe."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"This dynamic mythological scene showcases revolutionary use of color and movement drawn from classical texts exemplifying Italian Renaissance embrace of pagan mythology as worthy of serious artistic treatment.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'This dynamic mythological scene showcases revolutionary use of color and movement drawn from classical texts exemplifying Italian Renaissance embrace of pagan mythology as worthy of serious artistic treatment.'
 			},
@@ -360,11 +360,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This iconic frontal portrait projects overwhelming royal authority and effectively became the definitive visual representation of Tudor power especially significant in Henry's break with Rome and establishment of the Church of England.",
-					"This scene of violence and torture reflects trauma and moral collapse of Weimar Germany's birth using jagged composition to confront humanity stripped of dignity.",
-					"This breathtaking sculptural group depicts mystical vision of a Counter-Reformation saint with intense physical and spiritual rapture within a theatrical architectural frame.",
-					"This betrothal portrait is pivotal as an example of portraiture's political function illustrating high-stakes diplomatic negotiations of the Reformation era.",
-					"This anguished figure beneath a blood-red sky became the defining image of existential anxiety in modern life expressing psychological alienation."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"This iconic frontal portrait projects overwhelming royal authority and effectively became the definitive visual representation of Tudor power especially significant in Henry's break with Rome and establishment of the Church of England.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'This iconic frontal portrait projects overwhelming royal authority and effectively became the definitive visual representation of Tudor power especially significant in Henry\'s break with Rome and establishment of the Church of England.'
 			},
@@ -395,11 +395,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This painting is a pivotal example of portraiture's political function during the Reformation era showing how Renaissance portraiture could serve and distort high-stakes diplomatic negotiations.",
-					"This group portrait of surgeons witnessing dissection reflects Dutch Golden Age enthusiasm for empirical inquiry and establishes the artist's reputation.",
-					"This intimate character study exemplifies mastery of luminous light and reflects the thriving Dutch art market for private collectors.",
-					"This monumental sculpture redefined the male nude as embodying civic virtue and intellectual courage serving as a symbol of republican independence.",
-					"This portrait projects royal authority and becomes the standard for state portraiture across Europe under Napoleonic influence."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"This painting is a pivotal example of portraiture's political function during the Reformation era showing how Renaissance portraiture could serve and distort high-stakes diplomatic negotiations.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'This painting is a pivotal example of portraiture\'s political function during the Reformation era showing how Renaissance portraiture could serve and distort high-stakes diplomatic negotiations.'
 			},
@@ -430,11 +430,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This signature technique of extreme contrasts of light and dark gives biblical scene visceral shocking realism as a hallmark of Counter-Reformation Baroque style intended to move viewers emotionally toward faith.",
-					"This neoclassical work depicts an ancient philosopher choosing death over compromise widely read as critique of corruption and call for civic virtue on the eve of French Revolution.",
-					"This portrait painted during asylum confinement uses swirling blue brushstrokes and intense unflinching gaze to convey profound psychological depth through subjective Post-Impressionist expression.",
-					"This group portrait celebrates Amsterdam civic militia company with dynamic composition reflecting pride and prosperity of a merchant republic during the Golden Age.",
-					"This large Color Field canvas with hovering rectangles was intended to evoke religious emotional experiences and became central to Abstract Expressionist movement during Cold War."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"This signature technique of extreme contrasts of light and dark gives biblical scene visceral shocking realism as a hallmark of Counter-Reformation Baroque style intended to move viewers emotionally toward faith.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'This signature technique of extreme contrasts of light and dark gives biblical scene visceral shocking realism as a hallmark of Counter-Reformation Baroque style intended to move viewers emotionally toward faith.'
 			},
@@ -465,11 +465,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This breathtaking marble sculptural group set within a theatrical architectural frame depicts the mystical vision of St. Teresa of Ávila exemplifying Baroque strategy of engaging the senses to inspire religious devotion.",
-					"This radical proto-Cubist work shatters centuries of pictorial tradition by depicting distorted figures influenced by African masks challenging academic norms of ideal beauty.",
-					"This intense biblical scene uses chiaroscuro to give visceral realism breaking with idealized Renaissance conventions and influencing European painting for centuries.",
-					"This dynamic equestrian portrait depicts a military commander as heroic though historically inaccurate exemplifying Napoleonic propaganda and cult of personality.",
-					"This intimate domestic scene suffused with luminous light from a leaded window reflects Dutch Golden Age valuation of middle-class life as worthy of serious artistic treatment."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"This breathtaking marble sculptural group set within a theatrical architectural frame depicts the mystical vision of St. Teresa of \u00c1vila exemplifying Baroque strategy of engaging the senses to inspire religious devotion.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'This breathtaking marble sculptural group set within a theatrical architectural frame depicts the mystical vision of St. Teresa of Ávila exemplifying Baroque strategy of engaging the senses to inspire religious devotion.'
 			},
@@ -500,11 +500,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This group portrait of surgeons witnessing a public dissection reflects the Dutch Golden Age enthusiasm for empirical inquiry and scientific learning capturing the spirit of the Scientific Revolution.",
-					"This large-scale group portrait is celebrated for dynamic composition dramatic use of light and motion departing radically from static convention in Dutch group portraiture.",
-					"This tronie character study exemplifies mastery of luminous light and reflects how the thriving Dutch art market for private collectors drove artistic innovation.",
-					"This intimate domestic scene captures quiet everyday moments suffused with subtle light from a leaded window reflecting Dutch Golden Age values.",
-					"This portrait of entertainment venue barmaid uses a disorienting mirror reflection to create ambiguity about space and observe commodification of women's labor."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"This group portrait of surgeons witnessing a public dissection reflects the Dutch Golden Age enthusiasm for empirical inquiry and scientific learning capturing the spirit of the Scientific Revolution.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'This group portrait of surgeons witnessing a public dissection reflects the Dutch Golden Age enthusiasm for empirical inquiry and scientific learning capturing the spirit of the Scientific Revolution.'
 			},
@@ -535,11 +535,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This large-scale group portrait of an Amsterdam civic militia company is celebrated for dynamic composition dramatic use of light and motion departing radically from static conventions of Dutch group portraiture.",
-					"This intimate domestic scene captures quiet moments suffused with subtle luminous light from a leaded window reflecting Dutch Golden Age valuation of middle-class life.",
-					"This character study is celebrated for extraordinary intimacy and enigmatic gaze of an unknown subject exemplifying mastery of light in the Dutch Baroque period.",
-					"This group portrait of surgeons witnessing a dissection reflects Dutch enthusiasm for empirical inquiry and the spirit of the Scientific Revolution.",
-					"This portrait of a barmaid uses disorienting mirror reflection to observe modern Parisian commercial culture and commodification of women's bodies."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"This large-scale group portrait of an Amsterdam civic militia company is celebrated for dynamic composition dramatic use of light and motion departing radically from static conventions of Dutch group portraiture.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'This large-scale group portrait of an Amsterdam civic militia company is celebrated for dynamic composition dramatic use of light and motion departing radically from static conventions of Dutch group portraiture.'
 			},
@@ -570,11 +570,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This intimate domestic scene captures a quiet moment of everyday life suffused with subtle luminous light from a leaded window reflecting Dutch Golden Age's unique valuation of middle-class life as worthy of serious artistic treatment.",
-					"This large-scale group portrait celebrates civic militia with dynamic composition and dramatic light reflecting pride and prosperity of Amsterdam's merchant republic.",
-					"This character study with enigmatic gaze is celebrated for extraordinary intimacy exemplifying the thriving Dutch art market and mastery of luminous light.",
-					"This portrait of a barmaid at a famous venue uses disorienting mirror reflection to observe commercial culture and commodification of women's labor in entertainment.",
-					"This group portrait of surgeons reflects Dutch enthusiasm for empirical inquiry and scientific learning capturing the spirit of the Scientific Revolution."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"This intimate domestic scene captures a quiet moment of everyday life suffused with subtle luminous light from a leaded window reflecting Dutch Golden Age's unique valuation of middle-class life as worthy of serious artistic treatment.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'This intimate domestic scene captures a quiet moment of everyday life suffused with subtle luminous light from a leaded window reflecting Dutch Golden Age\'s unique valuation of middle-class life as worthy of serious artistic treatment.'
 			},
@@ -605,11 +605,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"Often called the Mona Lisa of the North this tronie is celebrated for extraordinary intimacy and enigmatic gaze exemplifying Vermeer's mastery of light and reflecting how Dutch art market for private collectors drove innovation.",
-					"This intimate domestic scene captures everyday life suffused with luminous light from a leaded window reflecting Dutch Golden Age valuation of middle-class domestic life.",
-					"This large-scale group portrait of militiamen is celebrated for dynamic composition and dramatic light reflecting the pride of Amsterdam's merchant republic.",
-					"This portrait of a barmaid uses disorienting mirror reflection to observe modern commercial culture and commodification of women's labor in Belle Époque entertainment.",
-					"This group portrait of surgeons witnessing dissection reflects Dutch Golden Age enthusiasm for empirical inquiry and scientific learning."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"Often called the Mona Lisa of the North this tronie is celebrated for extraordinary intimacy and enigmatic gaze exemplifying Vermeer's mastery of light and reflecting how Dutch art market for private collectors drove innovation.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'Often called the Mona Lisa of the North this tronie is celebrated for extraordinary intimacy and enigmatic gaze exemplifying Vermeer\'s mastery of light and reflecting how Dutch art market for private collectors drove innovation.'
 			},
@@ -640,11 +640,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"Painted on the eve of the French Revolution this neoclassical work depicts an ancient philosopher choosing death over compromise widely read as a critique of corruption and call for civic virtue.",
-					"This harrowing scene depicts execution of Spanish civilians with white-shirted martyr figure in Christ-like pose against faceless firing squad becoming one of history's most powerful anti-war images.",
-					"This idealized equestrian portrait though historically inaccurate exemplifies Napoleonic propaganda shaping the emperor's image as dynamic invincible leader.",
-					"This dynamic mythological scene showcases revolutionary use of color and movement exemplifying Italian Renaissance embrace of pagan mythology.",
-					"This anguished figure beneath blood-red sky became the defining image of existential anxiety expressing psychological alienation amid rapid industrialization."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"Painted on the eve of the French Revolution this neoclassical work depicts an ancient philosopher choosing death over compromise widely read as a critique of corruption and call for civic virtue.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'Painted on the eve of the French Revolution this neoclassical work depicts an ancient philosopher choosing death over compromise widely read as a critique of corruption and call for civic virtue.'
 			},
@@ -675,11 +675,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"Painted weeks after assassination of the radical journalist Jean-Paul Marat David transformed a murder scene into a secular martyrdom image as France's de facto propaganda minister during the Terror.",
-					"This portrait of Henry VIII projects overwhelming royal authority and became the definitive visual representation of Tudor power and state portraiture standards.",
-					"This Surrealist canvas depicts melting watches in a dreamlike landscape drawing on Freudian ideas to subvert rational understandings of time and reality.",
-					"This neoclassical work depicts an ancient philosopher choosing death over compromise widely read as critique of corruption on the eve of French Revolution.",
-					"This scene of Parisians dining by the Seine captures leisure culture and social freedoms of the Third Republic's prosperous early years during La Belle Époque."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"Painted weeks after assassination of the radical journalist Jean-Paul Marat David transformed a murder scene into a secular martyrdom image as France's de facto propaganda minister during the Terror.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'Painted weeks after assassination of the radical journalist Jean-Paul Marat David transformed a murder scene into a secular martyrdom image as France\'s de facto propaganda minister during the Terror.'
 			},
@@ -710,11 +710,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This idealized equestrian portrait though historically inaccurate depicts Napoleon as heroic military commander exemplifying systematic use of art to build and sustain the emperor's cult of personality.",
-					"This harrowing scene depicts execution of Spanish civilians using white-shirted martyr in Christ-like pose against faceless firing squad becoming one of history's most powerful anti-war images.",
-					"This work depicts ancient philosopher choosing death over compromise widely read as critique of corruption and call for civic virtue on eve of French Revolution.",
-					"This baroque sculptural group depicts mystical vision of a Counter-Reformation saint with intense spiritual rapture within theatrical architectural frame.",
-					"This portrait painting of an unknown woman as betrothal gift for Henry VIII illustrates high-stakes diplomatic negotiations of the Reformation era."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"This idealized equestrian portrait though historically inaccurate depicts Napoleon as heroic military commander exemplifying systematic use of art to build and sustain the emperor's cult of personality.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'This idealized equestrian portrait though historically inaccurate depicts Napoleon as heroic military commander exemplifying systematic use of art to build and sustain the emperor\'s cult of personality.'
 			},
@@ -745,11 +745,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"Painted after Napoleon's forces were driven out of Spain this harrowing scene depicts execution of Spanish civilians with unprecedented emotional rawness becoming one of history's most powerful anti-war images.",
-					"This idealized equestrian portrait depicts Napoleon as heroic military commander exemplifying systematic use of art for propaganda and cult of personality.",
-					"This neoclassical work depicts ancient philosopher choosing death over compromise widely read as critique of corruption on eve of French Revolution.",
-					"This portrait projects overwhelming royal authority becoming the definitive visual representation of Tudor power and establishing state portraiture standards across Europe.",
-					"This turbulent seascape inspired by the Zong massacre used Romantic expressiveness to make moral argument against slave trade just as Britain's abolitionist movement gained momentum."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"Painted after Napoleon's forces were driven out of Spain this harrowing scene depicts execution of Spanish civilians with unprecedented emotional rawness becoming one of history's most powerful anti-war images.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'Painted after Napoleon\'s forces were driven out of Spain this harrowing scene depicts execution of Spanish civilians with unprecedented emotional rawness becoming one of history\'s most powerful anti-war images.'
 			},
@@ -780,11 +780,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"Painted to commemorate the July Revolution of 1830 this Romantic masterpiece personifies Liberty bearing the tricolor flag across a barricade uniting classical allegory with contemporary political reality.",
-					"This turbulent seascape inspired by the Zong massacre made a moral argument against the slave trade anticipating Impressionism while serving as powerful social commentary.",
-					"This monumental marble statue redefined the male nude depicting David in anticipation embodying intellectual courage and serving as symbol of Florentine republican independence.",
-					"This harrowing scene of Spanish civilian execution with white-shirted martyr in Christ-like pose became one of history's most powerful anti-war images.",
-					"This scene of Parisians dining by the Seine captures leisure culture and social freedoms of the Third Republic's prosperous early years."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"Painted to commemorate the July Revolution of 1830 this Romantic masterpiece personifies Liberty bearing the tricolor flag across a barricade uniting classical allegory with contemporary political reality.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'Painted to commemorate the July Revolution of 1830 this Romantic masterpiece personifies Liberty bearing the tricolor flag across a barricade uniting classical allegory with contemporary political reality.'
 			},
@@ -815,11 +815,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"Inspired by the real-life Zong massacre this turbulent seascape used Romantic expressiveness to make a searing moral argument against the slave trade serving as one of the few major European artworks to directly confront Atlantic slavery.",
-					"This personification of Liberty bearing the tricolor flag across a barricade unites classical allegory with contemporary political reality as symbol of popular struggle for freedom.",
-					"This portrait painting though Henri VIII reportedly found the subject less attractive in person illustrates portraiture's political function during the Reformation era.",
-					"This monumental marble statue redefined the male nude depicting David in tense anticipation as symbol of Florentine republican independence.",
-					"This neoclassical work depicts ancient philosopher choosing death over compromise read as critique of corruption and call for civic virtue on eve of revolution."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"Inspired by the real-life Zong massacre this turbulent seascape used Romantic expressiveness to make a searing moral argument against the slave trade serving as one of the few major European artworks to directly confront Atlantic slavery.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'Inspired by the real-life Zong massacre this turbulent seascape used Romantic expressiveness to make a searing moral argument against the slave trade serving as one of the few major European artworks to directly confront Atlantic slavery.'
 			},
@@ -850,11 +850,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"Degas's numerous ballet scenes capture the rigorous labor behind Parisian entertainment during La Belle Époque depicting rehearsals rather than performances to reveal unglamorous reality of dancers' lives.",
-					"This hazy depiction of Le Havre port gave the Impressionist movement its name representing revolutionary break from academic painting transforming Western art.",
-					"This vibrant sun-drenched scene of Parisians dining by the Seine captures the leisure culture and social freedoms of the Third Republic's prosperous early years.",
-					"This stiffly posed scene of bourgeois Parisians in a park subtly satirizes social rigidity while demonstrating scientific Pointillist technique.",
-					"This swirling nocturnal landscape with vivid color expresses intense emotional and spiritual turmoil directly influencing development of Expressionism and abstraction."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"Degas's numerous ballet scenes capture the rigorous labor behind Parisian entertainment during La Belle \u00c9poque depicting rehearsals rather than performances to reveal unglamorous reality of dancers' lives.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'Degas\'s numerous ballet scenes capture the rigorous labor behind Parisian entertainment during La Belle Époque depicting rehearsals rather than performances to reveal unglamorous reality of dancers\' lives.'
 			},
@@ -885,11 +885,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This hazy depiction of the port of Le Havre gave the Impressionist movement its name when a critic used the title mockingly representing a revolutionary break from academic painting.",
-					"This vibrant sun-drenched scene of Parisians dining captures the leisure culture and social freedoms of the Third Republic's prosperous early years during La Belle Époque.",
-					"This stiffly posed scene of bourgeois people in a park subtly satirizes social rigidity while demonstrating scientific Pointillist technique applied over two years.",
-					"This swirling nocturnal landscape with vivid color and violent brushwork expresses intense emotional turmoil directly influencing Expressionism and abstraction.",
-					"Degas's numerous ballet scenes capture the rigorous labor behind entertainment depicting rehearsals to reveal the unglamorous reality of dancers' working lives."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"This hazy depiction of the port of Le Havre gave the Impressionist movement its name when a critic used the title mockingly representing a revolutionary break from academic painting.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'This hazy depiction of the port of Le Havre gave the Impressionist movement its name when a critic used the title mockingly representing a revolutionary break from academic painting.'
 			},
@@ -920,11 +920,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This vibrant sun-drenched scene of Parisian friends dining by the Seine captures the leisure culture of France's growing urban middle class considered one of the finest Impressionist achievements.",
-					"This hazy depiction of a port gave the Impressionist movement its name representing revolutionary break from academic painting transforming Western art.",
-					"This stiffly posed scene of bourgeois Parisians in a park subtly satirizes social rigidity while demonstrating scientific Pointillist technique.",
-					"This swirling nocturnal landscape expresses intense emotional turmoil through dynamic brushwork directly influencing Expressionism and abstraction.",
-					"This portrait of a barmaid uses disorienting mirror reflection to observe modern commercial culture and commodification of women's labor in entertainment."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"This vibrant sun-drenched scene of Parisian friends dining by the Seine captures the leisure culture of France's growing urban middle class considered one of the finest Impressionist achievements.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'This vibrant sun-drenched scene of Parisian friends dining by the Seine captures the leisure culture of France\'s growing urban middle class considered one of the finest Impressionist achievements.'
 			},
@@ -955,11 +955,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"Manet's final major painting depicts a barmaid at a famous venue using a disorienting mirror reflection to observe modern commercial culture and commodification of women's labor in Belle Époque entertainment.",
-					"This vibrant sun-drenched scene of friends dining by the Seine captures the leisure culture and social freedoms of the Third Republic's prosperous years.",
-					"This hazy depiction of Le Havre port gave the Impressionist movement its name representing revolutionary break from academic painting.",
-					"This stiffly posed scene of bourgeois Parisians subtly satirizes social rigidity while demonstrating the scientific Pointillist technique.",
-					"This swirling nocturnal landscape expresses intense emotional turmoil through dynamic brushwork directly influencing Expressionism and 20th-century abstraction."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"Manet's final major painting depicts a barmaid at a famous venue using a disorienting mirror reflection to observe modern commercial culture and commodification of women's labor in Belle \u00c9poque entertainment.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'Manet\'s final major painting depicts a barmaid at a famous venue using a disorienting mirror reflection to observe modern commercial culture and commodification of women\'s labor in Belle Époque entertainment.'
 			},
@@ -990,11 +990,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This anguished figure beneath a blood-red sky became the defining image of existential anxiety in modern life expressing psychological alienation amid rapid industrialization and was foundational to Expressionism development.",
-					"This stiffly posed scene of bourgeois Parisians in a park subtly satirizes social rigidity while demonstrating scientific Pointillist color technique.",
-					"This swirling nocturnal landscape expresses intense emotional turmoil through dynamic brushwork directly influencing development of Expressionism and abstraction.",
-					"This hazy depiction of Le Havre port gave the Impressionist movement its name representing revolutionary break from academic painting.",
-					"This vibrant scene of Parisians dining captures leisure culture and social freedoms of the Third Republic's prosperous early Belle Époque years."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"This anguished figure beneath a blood-red sky became the defining image of existential anxiety in modern life expressing psychological alienation amid rapid industrialization and was foundational to Expressionism development.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'This anguished figure beneath a blood-red sky became the defining image of existential anxiety in modern life expressing psychological alienation amid rapid industrialization and was foundational to Expressionism development.'
 			},
@@ -1025,11 +1025,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"Seurat spent two years applying his scientific Pointillist technique placing tiny dots of pure color side by side with stiffly posed bourgeois Parisians subtly satirizing social rigidity of French society.",
-					"This anguished figure beneath blood-red sky became the defining image of existential anxiety expressing psychological alienation amid rapid industrialization.",
-					"This swirling nocturnal landscape expresses intense emotional turmoil through dynamic brushwork directly influencing Expressionism and abstraction.",
-					"This vibrant sun-drenched scene of friends dining captures leisure culture and social freedoms of the Third Republic's prosperous early years.",
-					"This hazy depiction of a port gave the Impressionist movement its name representing revolutionary break from academic painting transforming Western art."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"Seurat spent two years applying his scientific Pointillist technique placing tiny dots of pure color side by side with stiffly posed bourgeois Parisians subtly satirizing social rigidity of French society.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'Seurat spent two years applying his scientific Pointillist technique placing tiny dots of pure color side by side with stiffly posed bourgeois Parisians subtly satirizing social rigidity of French society.'
 			},
@@ -1060,11 +1060,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"Painted while confined to asylum this swirling nocturnal landscape expresses intense emotional and spiritual turmoil through dynamic almost violent brushwork directly influencing Expressionism and abstraction.",
-					"Seurat's scientific Pointillist technique with stiffly posed bourgeois Parisians subtly satirizes social rigidity while representing moment when avant-garde engaged with color theory.",
-					"This anguished figure beneath blood-red sky became the defining image of existential anxiety expressing psychological alienation amid rapid industrialization.",
-					"This hazy depiction of Le Havre port gave the Impressionist movement its name representing revolutionary break from academic painting.",
-					"This vibrant sun-drenched scene of friends dining captures leisure culture and social freedoms of the Third Republic's prosperous early Belle Époque years."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"Painted while confined to asylum this swirling nocturnal landscape expresses intense emotional and spiritual turmoil through dynamic almost violent brushwork directly influencing Expressionism and abstraction.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'Painted while confined to asylum this swirling nocturnal landscape expresses intense emotional and spiritual turmoil through dynamic almost violent brushwork directly influencing Expressionism and abstraction.'
 			},
@@ -1095,11 +1095,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"One of over 30 self-portraits Van Gogh produced this work painted at the asylum uses swirling blue brushstrokes and intense unflinching gaze to convey profound psychological depth influencing how later artists approached introspective autobiographical work.",
-					"This swirling nocturnal landscape expresses intense emotional turmoil through dynamic brushwork directly influencing development of Expressionism and abstraction.",
-					"This anguished figure beneath blood-red sky became the defining image of existential anxiety expressing psychological alienation amid industrialization.",
-					"This vibrant scene of Parisians dining captures leisure culture and social freedoms of the Third Republic's prosperous early Belle Époque years.",
-					"This stiffly posed scene of bourgeois Parisians subtly satirizes social rigidity while demonstrating scientific Pointillist color technique applied methodically."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"One of over 30 self-portraits Van Gogh produced this work painted at the asylum uses swirling blue brushstrokes and intense unflinching gaze to convey profound psychological depth influencing how later artists approached introspective autobiographical work.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'One of over 30 self-portraits Van Gogh produced this work painted at the asylum uses swirling blue brushstrokes and intense unflinching gaze to convey profound psychological depth influencing how later artists approached introspective autobiographical work.'
 			},
@@ -1130,11 +1130,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"The golden masterpiece of Vienna's Jugendstil movement this painting fuses Byzantine gold mosaic with sinuous organic decoration representing total art of the 20th century in fin-de-siècle Vienna.",
-					"This radical proto-Cubist work shattered centuries of pictorial tradition by depicting distorted figures influenced by African masks and Iberian sculpture.",
-					"This monochromatic Cubist painting depicts the suffering of civilians during aerial warfare becoming the most powerful anti-war artwork of the 20th century.",
-					"One of over 30 self-portraits this work uses swirling brushstrokes and intense gaze to convey psychological depth at the asylum.",
-					"This small canvas depicts melting watches in a dreamlike landscape drawing on Freudian ideas to subvert rational understandings of time."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"The golden masterpiece of Vienna's Jugendstil movement this painting fuses Byzantine gold mosaic with sinuous organic decoration representing total art of the 20th century in fin-de-si\u00e8cle Vienna.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'The golden masterpiece of Vienna\'s Jugendstil movement this painting fuses Byzantine gold mosaic with sinuous organic decoration representing total art of the 20th century in fin-de-siècle Vienna.'
 			},
@@ -1165,11 +1165,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"Painted in the immediate aftermath of World War I and failed German Revolution this nightmarish scene of violence and torture reflects trauma and moral collapse of Weimar Germany's birth.",
-					"This monochromatic Cubist painting depicts suffering of civilians during aerial bombing becoming the most powerful anti-war artwork of the 20th century.",
-					"This harrowing scene depicts execution of Spanish civilians with white-shirted martyr in Christ-like pose becoming one of history's most powerful anti-war images.",
-					"This elongated emaciated bronze figure embodies postwar Existentialist spirit suggesting both survival and irreducible human dignity in face of destruction.",
-					"This radical proto-Cubist work shatters centuries of pictorial tradition by depicting distorted figures influenced by African masks and Iberian sculpture."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"Painted in the immediate aftermath of World War I and failed German Revolution this nightmarish scene of violence and torture reflects trauma and moral collapse of Weimar Germany's birth.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'Painted in the immediate aftermath of World War I and failed German Revolution this nightmarish scene of violence and torture reflects trauma and moral collapse of Weimar Germany\'s birth.'
 			},
@@ -1200,11 +1200,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This radical proto-Cubist work shatters centuries of Western pictorial tradition by depicting five nude figures with distorted fragmented forms announcing the beginning of Cubism and modern art.",
-					"This monochromatic Cubist painting depicts suffering of civilians during aerial warfare becoming the most powerful anti-war artwork of the 20th century.",
-					"The golden masterpiece of Vienna's Jugendstil movement fusing Byzantine gold mosaic with sinuous organic decoration representing total art.",
-					"This small canvas depicts melting watches in a dreamlike landscape drawing on Freudian ideas to subvert rational understandings of time and reality.",
-					"This nightmarish scene of violence and torture reflects trauma and moral collapse of Weimar Germany's birth after World War I."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"This radical proto-Cubist work shatters centuries of Western pictorial tradition by depicting five nude figures with distorted fragmented forms announcing the beginning of Cubism and modern art.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'This radical proto-Cubist work shatters centuries of Western pictorial tradition by depicting five nude figures with distorted fragmented forms announcing the beginning of Cubism and modern art.'
 			},
@@ -1235,11 +1235,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This small Surrealist canvas depicts melting watches in a barren dreamlike landscape drawing on Freudian ideas to subvert rational understandings of time and reality.",
-					"This radical proto-Cubist work shatters centuries of pictorial tradition by depicting distorted figures influenced by African masks announcing Cubism.",
-					"This monochromatic Cubist painting depicts suffering of civilians during aerial bombing becoming the most powerful anti-war artwork of the 20th century.",
-					"This nightmarish scene reflects trauma and moral collapse of Weimar Germany's birth using Expressionism and medieval altarpiece influences.",
-					"The golden masterpiece of Vienna's Jugendstil movement fuses Byzantine mosaic with organic decoration representing total art of fin-de-siècle Vienna."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"This small Surrealist canvas depicts melting watches in a barren dreamlike landscape drawing on Freudian ideas to subvert rational understandings of time and reality.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'This small Surrealist canvas depicts melting watches in a barren dreamlike landscape drawing on Freudian ideas to subvert rational understandings of time and reality.'
 			},
@@ -1270,13 +1270,13 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"Commissioned by Spanish Republicans and inspired by Nazi bombing of Guernica this enormous monochromatic Cubist painting depicts civilian suffering with raw fragmented anguish becoming the most powerful anti-war artwork of the 20th century.",
-					"This small Surrealist canvas depicts melting watches drawing on Freudian ideas to subvert rational understandings of time and reality.",
-					"This radical proto-Cubist work shatters centuries of pictorial tradition by depicting distorted figures influenced by African masks and Iberian sculpture.",
-					"This elongated emaciated bronze figure embodies postwar Existentialist spirit suggesting survival and irreducible human dignity in face of destruction.",
-					"This nightmarish scene reflects trauma and moral collapse of Weimar Germany's birth using jagged compressed Expressionist composition."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"Commissioned by Spanish Republicans after the Nazi bombing of a Basque town, this enormous monochromatic Cubist painting depicts civilian suffering with fragmented anguish and became one of the most powerful anti-war artworks of the 20th century.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
-				correct: 'Commissioned by Spanish Republicans and inspired by Nazi bombing of Guernica this enormous monochromatic Cubist painting depicts civilian suffering with raw fragmented anguish becoming the most powerful anti-war artwork of the 20th century.'
+				correct: 'Commissioned by Spanish Republicans after the Nazi bombing of a Basque town, this enormous monochromatic Cubist painting depicts civilian suffering with fragmented anguish and became one of the most powerful anti-war artworks of the 20th century.'
 			},
 		]
 	},
@@ -1305,11 +1305,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"This elongated emaciated bronze figure embodies the postwar Existentialist spirit with fragile human presence reaching into an uncertain void profoundly influencing Jean-Paul Sartre's philosophy.",
-					"This monochromatic Cubist painting depicts civilian suffering during aerial warfare becoming the most powerful anti-war artwork of the 20th century.",
-					"This small Surrealist canvas depicts melting watches drawing on Freudian ideas to subvert rational understandings of time and reality.",
-					"This large Color Field canvas with luminous hovering rectangles was intended to evoke profound religious emotional experiences central to Abstract Expressionism.",
-					"This radical proto-Cubist work shatters centuries of pictorial tradition by depicting distorted figures influenced by African masks announcing modern art."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"This elongated emaciated bronze figure embodies the postwar Existentialist spirit with fragile human presence reaching into an uncertain void profoundly influencing Jean-Paul Sartre's philosophy.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'This elongated emaciated bronze figure embodies the postwar Existentialist spirit with fragile human presence reaching into an uncertain void profoundly influencing Jean-Paul Sartre\'s philosophy.'
 			},
@@ -1340,11 +1340,11 @@ const quizData = [
 				type: 'text-mc',
 				label: "Significance:",
 				options: [
-					"Rothko's large Color Field canvas with luminous hovering rectangles of color was intended to evoke profound almost religious emotional experiences becoming central to Abstract Expressionism movement during Cold War.",
-					"This elongated emaciated bronze figure embodies postwar Existentialist spirit suggesting survival and irreducible human dignity in face of destruction.",
-					"This monochromatic Cubist painting depicts suffering of civilians during aerial bombing becoming the most powerful anti-war artwork of the 20th century.",
-					"This small Surrealist canvas depicts melting watches drawing on Freudian ideas to subvert rational understandings of time and reality.",
-					"This radical proto-Cubist work shatters centuries of pictorial tradition by depicting distorted figures influenced by African masks and Iberian sculpture."
+							"A dramatic anti-war mural responding to the bombing of a civilian town, notable for fragmented forms and monochrome intensity.",
+							"A domestic Dutch interior that elevates everyday middle-class life through quiet light and meticulous surface detail.",
+							"Rothko's large Color Field canvas with luminous hovering rectangles of color was intended to evoke profound almost religious emotional experiences becoming central to Abstract Expressionism movement during Cold War.",
+							"Its historical importance comes mainly from being the first major artwork to use photography as its primary medium.",
+							"It is chiefly significant for directly triggering the outbreak of a major European war within a year of its unveiling."
 				],
 				correct: 'Rothko\'s large Color Field canvas with luminous hovering rectangles of color was intended to evoke profound almost religious emotional experiences becoming central to Abstract Expressionism movement during Cold War.'
 			},
