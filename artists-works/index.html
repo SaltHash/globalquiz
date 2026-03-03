@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Artists and Works – GlobalQuiz</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+	<link rel="stylesheet" href="/assets/colors.css">
+	<script>
+		(function() {
+			try {
+				var s = JSON.parse(localStorage.getItem('quizSettings'));
+				if (s && s.isDark) document.documentElement.classList.add('dark-mode');
+				if (s && !s.isGlass) document.documentElement.classList.add('no-glass');
+			} catch(e) {}
+		})();
+	</script>
+	<style>
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+			font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+		}
+		body {
+			min-height: 100vh;
+			background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+			color: var(--text-primary);
+		}
+
+		/* ── Settings toggle ── */
+		.settings-toggle {
+		    background: transparent;
+		    border: 1px solid var(--glass-border);
+		    color: var(--text-primary);
+		    width: 38px; height: 38px;
+		    border-radius: 8px;
+		    cursor: pointer;
+		    display: flex; align-items: center; justify-content: center;
+		    transition: all 0.2s ease;
+		    font-size: 1.2rem;
+		}
+		.settings-toggle:hover { background: var(--card-bg); border-color: var(--button-bg); }
+		#settingsMenu {
+		    position: absolute;
+		    top: calc(100% + 10px); right: 0;
+		    width: 220px;
+		    background: var(--bg-gradient-end);
+		    background-image: linear-gradient(var(--card-bg), var(--card-bg));
+		    border: 1px solid var(--card-border);
+		    padding: 1.25rem;
+		    border-radius: 12px;
+		    box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+		    display: none;
+		    animation: fadeIn 0.2s ease-out;
+		    z-index: 1100;
+		}
+		@keyframes fadeIn { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+		#settingsMenu h4 {
+		    margin-bottom: 1rem; font-size: 0.9rem;
+		    text-transform: uppercase; letter-spacing: 1px;
+		    color: var(--button-bg);
+		}
+		.setting-item { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; font-size:0.95rem; }
+		.switch { position:relative; display:inline-block; width:40px; height:20px; }
+		.switch input { opacity:0; width:0; height:0; }
+		.slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:var(--glass-border); transition:.4s; border-radius:20px; }
+		.slider:before { position:absolute; content:""; height:14px; width:14px; left:3px; bottom:3px; background-color:white; transition:.4s; border-radius:50%; }
+		input:checked + .slider { background-color: var(--button-bg); }
+		input:checked + .slider:before { transform: translateX(20px); }
+
+		/* ── Navbar ── */
+		nav, .question-card, .leaderboard-section {
+		    backdrop-filter: var(--blur-val) !important;
+		    -webkit-backdrop-filter: var(--blur-val) !important;
+		}
+		nav {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    position: sticky; top: 0;
+		    background: var(--glass-bg);
+		    border-bottom: 1px solid var(--glass-border);
+		    padding: 0.75rem 2rem;
+		    z-index: 1000;
+		}
+		.nav-left { display:flex; align-items:center; gap:1.5rem; }
+		.nav-title {
+			font-size: 1.2rem; font-weight: 700;
+			text-decoration: none; color: var(--text-primary);
+		}
+		.nav-links { display:flex; gap:0.25rem; }
+		.nav-link {
+			font-size: 0.95rem; font-weight: 500;
+			color: var(--text-secondary);
+			text-decoration: none;
+			padding: 0.3rem 0.7rem; border-radius: 6px;
+			transition: all 0.2s;
+		}
+		.nav-link:hover { color: var(--text-primary); background: var(--card-bg); }
+		.nav-link.active { color: var(--text-primary); }
+		.quiz-stats { display:flex; gap:2rem; font-size:0.95rem; }
+
+		/* ── Main layout ── */
+		main { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
+
+		.quiz-header { text-align: center; margin-bottom: 2rem; }
+		.quiz-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+		.quiz-header p { color: var(--text-secondary); font-size: 1.1rem; }
+
+		/* ── Question count selector ── */
+		.question-count-selector {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0.5rem;
+			margin-bottom: 2rem;
+			flex-wrap: wrap;
+		}
+		.question-count-selector span {
+			font-size: 0.95rem;
+			color: var(--text-secondary);
+			margin-right: 0.25rem;
+		}
+		.count-btn {
+			background: var(--card-bg);
+			border: 2px solid var(--card-border);
+			color: var(--text-primary);
+			padding: 0.4rem 1rem;
+			border-radius: 6px;
+			font-size: 0.95rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+		.count-btn:hover { border-color: var(--button-bg); }
+		.count-btn.active {
+			background: var(--button-bg);
+			color: var(--button-text);
+			border-color: var(--button-bg);
+		}
+
+		/* ── Leaderboard ── */
+		.leaderboard-section {
+			background: var(--card-bg);
+			border: 1px solid var(--card-border);
+			border-radius: 12px;
+			padding: 1.5rem;
+			margin-bottom: 2rem;
+		}
+		.leaderboard-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+			flex-wrap: wrap;
+			gap: 0.75rem;
+		}
+		.leaderboard-header h2 { font-size: 1.3rem; }
+		.leaderboard-filter {
+			display: flex;
+			gap: 0.4rem;
+			flex-wrap: wrap;
+		}
+		.filter-btn {
+			background: transparent;
+			border: 1px solid var(--card-border);
+			color: var(--text-secondary);
+			padding: 0.25rem 0.65rem;
+			border-radius: 5px;
+			font-size: 0.85rem;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+		.filter-btn:hover { border-color: var(--button-bg); color: var(--text-primary); }
+		.filter-btn.active {
+			background: var(--button-bg);
+			color: var(--button-text);
+			border-color: var(--button-bg);
+		}
+		.leaderboard-empty { color: var(--text-secondary); font-style: italic; }
+		.leaderboard-list { display:flex; flex-direction:column; gap:0.6rem; }
+		.leaderboard-item {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+			padding: 0.65rem 0.75rem;
+			background: rgba(128,128,128,0.06);
+			border-radius: 6px;
+		}
+		.leaderboard-rank { font-weight:700; font-size:1rem; width:28px; flex-shrink:0; }
+		.rank-gold   { color: #f5c842; }
+		.rank-silver { color: #aab4be; }
+		.rank-bronze { color: #cd7f32; }
+		.leaderboard-name { flex:1; font-weight:500; }
+		.leaderboard-stats {
+			display: flex; gap: 1.25rem;
+			font-size: 0.9rem; color: var(--text-secondary);
+		}
+		.lb-loading { color: var(--text-secondary); font-style: italic; }
+
+		/* ── Question card ── */
+		.question-card {
+			background: var(--card-bg);
+			border: 1px solid var(--card-border);
+			border-radius: 12px;
+			padding: 2rem;
+			margin-bottom: 1.5rem;
+		}
+		.question-number { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem; }
+		.question-text { font-size: 1.2rem; font-weight: 500; margin-bottom: 1.5rem; }
+		.question-image { width:100%; max-width:500px; margin:1rem auto; display:block; border-radius:8px; }
+
+		.answer-section { margin-top: 1.5rem; }
+		.answer-label { font-size:0.95rem; color:var(--text-secondary); margin-bottom:0.5rem; display:block; }
+
+		.text-input {
+			width: 100%;
+			padding: 0.75rem;
+			background: rgba(128,128,128,0.08);
+			border: 1px solid var(--card-border);
+			border-radius: 6px;
+			color: var(--text-primary);
+			font-size: 1rem;
+			margin-bottom: 1rem;
+		}
+		.text-input:focus { outline: 2px solid var(--button-bg); }
+		.text-input::placeholder { color: var(--text-secondary); opacity: 0.6; }
+
+		.mc-options { display:flex; flex-direction:column; gap:0.75rem; margin-bottom:1rem; }
+		.mc-options.compact { flex-direction:row; flex-wrap:wrap; gap:0.5rem; }
+		.mc-option {
+			padding: 0.75rem 1rem;
+			background: rgba(128,128,128,0.08);
+			border: 2px solid var(--card-border);
+			border-radius: 6px;
+			cursor: pointer;
+			transition: all 0.2s;
+			display: flex; align-items: center; gap: 0.75rem;
+		}
+		.mc-option:hover { background: rgba(128,128,128,0.15); border-color: var(--button-bg); }
+		.mc-option.selected { background: rgba(90,103,216,0.15); border-color: var(--button-bg); }
+		.mc-option.compact { padding:0.5rem 0.75rem; font-size:0.95rem; white-space:nowrap; }
+		.mc-option input[type="radio"] { margin:0; cursor:pointer; }
+
+		.image-mc-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-bottom:1rem; }
+		.image-mc-option {
+			cursor:pointer;
+			border: 3px solid var(--card-border);
+			border-radius: 8px;
+			overflow: hidden;
+			transition: all 0.2s;
+			position: relative;
+		}
+		.image-mc-option:hover { border-color: var(--button-bg); }
+		.image-mc-option.selected { border-color: var(--button-bg); box-shadow: 0 0 0 3px rgba(90,103,216,0.3); }
+		.image-mc-option img { width:100%; height:150px; object-fit:cover; display:block; }
+		.image-mc-option input { position:absolute; top:8px; right:8px; }
+
+		/* ── Buttons ── */
+		.submit-button {
+			width: 100%;
+			background: var(--button-bg);
+			color: var(--button-text);
+			border: none;
+			padding: 1rem;
+			border-radius: 8px;
+			font-size: 1.1rem;
+			font-weight: 600;
+			cursor: pointer;
+			margin-top: 1rem;
+			transition: background-color 0.2s;
+		}
+		.submit-button:hover { background: var(--button-hover); }
+		.submit-button:disabled { opacity:0.5; cursor:not-allowed; }
+		.retry-button {
+			background: transparent;
+			border: 2px solid var(--button-bg);
+			color: var(--text-primary);
+			padding: 0.75rem 2rem;
+			border-radius: 8px;
+			font-size: 1rem;
+			font-weight: 600;
+			cursor: pointer;
+			margin-top: 1rem;
+			transition: background 0.2s;
+		}
+		.retry-button:hover { background: rgba(90,103,216,0.1); }
+
+		/* ── Results ── */
+		.results-container { text-align: center; }
+		.results-score { font-size: 3rem; font-weight: 700; margin: 2rem 0; }
+		.results-details { font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 2rem; }
+
+		/* ── Submit Score Modal ── */
+		.modal-backdrop {
+			position: fixed;
+			inset: 0;
+			background: rgba(0,0,0,0.55);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 2000;
+			animation: fadeIn 0.2s ease-out;
+		}
+		.modal-backdrop.hidden { display: none; }
+		.modal {
+			background: var(--card-bg);
+			border: 1px solid var(--card-border);
+			border-radius: 14px;
+			padding: 2rem;
+			width: 90%;
+			max-width: 380px;
+			box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+			animation: modalIn 0.25s ease-out;
+		}
+		@keyframes modalIn {
+			from { opacity:0; transform: scale(0.94) translateY(10px); }
+			to   { opacity:1; transform: scale(1)    translateY(0); }
+		}
+		.modal h2 { font-size:1.4rem; margin-bottom:0.5rem; }
+		.modal p  { color: var(--text-secondary); font-size:0.95rem; margin-bottom:1.25rem; }
+		.modal-score-preview {
+			font-size: 1.1rem;
+			font-weight: 600;
+			margin-bottom: 1.25rem;
+			color: var(--button-bg);
+		}
+		.modal-input {
+			width: 100%;
+			padding: 0.75rem;
+			background: rgba(128,128,128,0.1);
+			border: 1px solid var(--card-border);
+			border-radius: 6px;
+			color: var(--text-primary);
+			font-size: 1rem;
+			margin-bottom: 0.4rem;
+		}
+		.modal-input:focus { outline: 2px solid var(--button-bg); }
+		.modal-charcount {
+			font-size: 0.8rem;
+			color: var(--text-secondary);
+			text-align: right;
+			margin-bottom: 1.25rem;
+		}
+		.modal-buttons { display:flex; gap:0.75rem; }
+		.modal-btn {
+			flex:1;
+			padding: 0.65rem;
+			border-radius: 7px;
+			font-size: 0.95rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.2s;
+			border: none;
+		}
+		.modal-btn-primary {
+			background: var(--button-bg);
+			color: var(--button-text);
+		}
+		.modal-btn-primary:hover { background: var(--button-hover); }
+		.modal-btn-primary:disabled { opacity:0.5; cursor:not-allowed; }
+		.modal-btn-secondary {
+			background: transparent;
+			border: 2px solid var(--card-border);
+			color: var(--text-primary);
+		}
+		.modal-btn-secondary:hover { border-color: var(--button-bg); }
+		.modal-error {
+			color: var(--incorrect);
+			font-size: 0.9rem;
+			margin-bottom: 0.75rem;
+			min-height: 1.2em;
+		}
+		.modal-success {
+			text-align: center;
+			padding: 1rem 0 0.5rem;
+		}
+		.modal-success .checkmark { font-size: 2.5rem; margin-bottom: 0.5rem; }
+		.modal-success p { color: var(--text-primary); font-weight:600; font-size:1.05rem; }
+
+		.hidden { display: none; }
+
+		@media (max-width:600px) {
+			.quiz-stats { gap:1rem; font-size:0.85rem; }
+			.image-mc-grid { grid-template-columns: repeat(2,1fr); }
+			.leaderboard-stats { flex-direction:column; gap:0.2rem; }
+			.mc-options.compact { gap:0.4rem; }
+			.mc-option.compact { padding:0.4rem 0.6rem; font-size:0.9rem; }
+			.nav-links { display:none; }
+		}
+	</style>
+</head>
+<body>
+
+<!-- ── Submit Score Modal ── -->
+<div class="modal-backdrop hidden" id="scoreModal">
+	<div class="modal">
+		<div id="modalFormState">
+			<h2>Submit Score</h2>
+			<p>Enter a display name to post your score to the global leaderboard.</p>
+			<div class="modal-score-preview" id="modalScorePreview"></div>
+			<input
+				class="modal-input"
+				type="text"
+				id="modalDisplayName"
+				placeholder="Display name"
+				maxlength="20"
+				autocomplete="off"
+			>
+			<div class="modal-charcount"><span id="modalCharCount">0</span>/20</div>
+			<div class="modal-error" id="modalError"></div>
+			<div class="modal-buttons">
+				<button class="modal-btn modal-btn-secondary" onclick="closeModal()">Don't submit</button>
+				<button class="modal-btn modal-btn-primary" id="modalSubmitBtn" onclick="submitScore()">Submit</button>
+			</div>
+		</div>
+		<div id="modalSuccessState" class="modal-success hidden">
+			<div class="checkmark">✅</div>
+			<p id="modalSuccessMsg">Score submitted!</p>
+		</div>
+	</div>
+</div>
+
+<nav>
+    <div class="nav-left">
+    	<a class="nav-title" href="/">GlobalQuiz</a>
+    	<div class="nav-links">
+    		<a class="nav-link active" href="/artists-works">Artists &amp; Works</a>
+    	</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:1.5rem;">
+	    <div class="quiz-stats">
+	        <div>Questions: <strong id="questionCount">0/0</strong></div>
+	        <div>Time: <strong id="timer">0:00</strong></div>
+	    </div>
+	    <div style="position: relative;">
+	        <button class="settings-toggle" onclick="toggleSettingsMenu()">⚙️</button>
+	        <div id="settingsMenu">
+	            <h4>Preferences</h4>
+	            <div class="setting-item">
+	                <span>Dark Mode</span>
+	                <label class="switch">
+	                    <input type="checkbox" id="darkModeToggle" onchange="updateSettings()">
+	                    <span class="slider"></span>
+	                </label>
+	            </div>
+	            <div class="setting-item">
+	                <span>Glass Effect</span>
+	                <label class="switch">
+	                    <input type="checkbox" id="glassToggle" checked onchange="updateSettings()">
+	                    <span class="slider"></span>
+	                </label>
+	            </div>
+	        </div>
+	    </div>
+    </div>
+</nav>
+
+<main>
+	<!-- ── Quiz view ── -->
+	<div id="quizContainer">
+		<div class="quiz-header">
+			<h1>Artists and Works</h1>
+			<p>Identify information about paintings from their pictures</p>
+		</div>
+
+		<!-- Question count selector -->
+		<div class="question-count-selector">
+			<span>Questions:</span>
+			<button class="count-btn active" data-count="10" onclick="setQuestionCount(10, this)">10</button>
+			<button class="count-btn" data-count="20" onclick="setQuestionCount(20, this)">20</button>
+			<button class="count-btn" data-count="30" onclick="setQuestionCount(30, this)">30</button>
+			<button class="count-btn" data-count="all" onclick="setQuestionCount('all', this)">All</button>
+		</div>
+
+		<!-- Leaderboard -->
+		<div class="leaderboard-section">
+			<div class="leaderboard-header">
+				<h2>🏆 Global Leaderboard</h2>
+				<div class="leaderboard-filter" id="lbFilter">
+					<button class="filter-btn active" data-n="10" onclick="setLbFilter(10, this)">10 Q</button>
+					<button class="filter-btn" data-n="20" onclick="setLbFilter(20, this)">20 Q</button>
+					<button class="filter-btn" data-n="30" onclick="setLbFilter(30, this)">30 Q</button>
+					<button class="filter-btn" data-n="38" onclick="setLbFilter(38, this)">All</button>
+				</div>
+			</div>
+			<div id="topScores"><div class="lb-loading">Loading…</div></div>
+		</div>
+
+		<div id="questionsContainer"></div>
+
+		<button class="submit-button" id="submitQuiz">Submit Quiz</button>
+	</div>
+
+	<!-- ── Results view ── -->
+	<div id="resultsContainer" class="hidden">
+		<div class="results-container">
+			<div class="quiz-header">
+				<h1>Quiz Complete!</h1>
+			</div>
+			<div class="results-score" id="finalScore">0/0</div>
+			<div class="results-details" id="resultsDetails"></div>
+
+			<!-- Results leaderboard -->
+			<div class="leaderboard-section" style="text-align:left;">
+				<div class="leaderboard-header">
+					<h2>🏆 Global Leaderboard</h2>
+					<div class="leaderboard-filter" id="lbFilterResults">
+						<button class="filter-btn active" data-n="10" onclick="setLbFilterResults(10, this)">10 Q</button>
+						<button class="filter-btn" data-n="20" onclick="setLbFilterResults(20, this)">20 Q</button>
+						<button class="filter-btn" data-n="30" onclick="setLbFilterResults(30, this)">30 Q</button>
+						<button class="filter-btn" data-n="38" onclick="setLbFilterResults(38, this)">All</button>
+					</div>
+				</div>
+				<div id="topScoresResults"><div class="lb-loading">Loading…</div></div>
+			</div>
+
+			<button class="submit-button" onclick="openModal()" id="openModalBtn">Submit Score</button>
+			<br>
+			<button class="retry-button" onclick="location.reload()">Take Quiz Again</button>
+		</div>
+	</div>
+</main>
+
+<script src="DATA.js"></script>
+<script>
+const SUPABASE_URL  = 'https://pscwcpdqmfpmmmjfozsz.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzY3djcGRxbWZwbW1tamZvenN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwNzA5NzIsImV4cCI6MjA4NTY0Njk3Mn0.1dB_mvPBQ9V1YIcTgjce-8nJiqlTo0KB8bqmpRf0kSI';
+
+async function sbFetch(path, opts = {}) {
+	const res = await fetch(SUPABASE_URL + path, {
+		...opts,
+		headers: {
+			'apikey': SUPABASE_ANON,
+			'Authorization': 'Bearer ' + SUPABASE_ANON,
+			'Content-Type': 'application/json',
+			...(opts.headers || {})
+		}
+	});
+	if (!res.ok) {
+		const err = await res.json().catch(() => ({}));
+		throw new Error(err.message || err.hint || res.statusText);
+	}
+	return res.json();
+}
+
+// ── State ────────────────────────────────────────────────────────────
+let activeQuestions = [];    // subset of quizData based on chosen count
+let selectedCount   = 10;    // numeric question count (or total for "all")
+let lbFilterCount   = 10;
+let lbFilterCountResults = 10;
+let startTime, timerInterval;
+let pendingScore = null;
+
+// ── Question count ────────────────────────────────────────────────────
+function setQuestionCount(val, btn) {
+	document.querySelectorAll('.count-btn').forEach(b => b.classList.remove('active'));
+	btn.classList.add('active');
+
+	const n = (val === 'all') ? quizData.length : Math.min(val, quizData.length);
+	selectedCount = n;
+
+	// Shuffle and pick
+	const shuffled = [...quizData].sort(() => Math.random() - 0.5);
+	activeQuestions = shuffled.slice(0, n);
+
+	renderQuestions();
+	document.getElementById('questionCount').textContent = `0/${n}`;
+	resetTimer();
+}
+
+// ── Leaderboard filter ───────────────────────────────────────────────
+function setLbFilter(n, btn) {
+	lbFilterCount = n;
+	document.querySelectorAll('#lbFilter .filter-btn').forEach(b => b.classList.remove('active'));
+	btn.classList.add('active');
+	loadLeaderboard('topScores', n);
+}
+
+function setLbFilterResults(n, btn) {
+	lbFilterCountResults = n;
+	document.querySelectorAll('#lbFilterResults .filter-btn').forEach(b => b.classList.remove('active'));
+	btn.classList.add('active');
+	loadLeaderboard('topScoresResults', n);
+}
+
+async function loadLeaderboard(containerId, numQuestions) {
+	const container = document.getElementById(containerId);
+	container.innerHTML = '<div class="lb-loading">Loading…</div>';
+	try {
+		const rows = await sbFetch(
+			`/rest/v1/scores?quiz=eq.artists-works&num_questions=eq.${numQuestions}&order=correct.desc,time_secs.asc&limit=10&select=display_name,correct,total,time_secs`
+		);
+		if (!rows.length) {
+			container.innerHTML = '<div class="leaderboard-empty">No scores yet. Be the first!</div>';
+			return;
+		}
+		const rankClasses = ['rank-gold', 'rank-silver', 'rank-bronze'];
+		container.innerHTML = '<div class="leaderboard-list">' +
+			rows.map((r, i) => `
+				<div class="leaderboard-item">
+					<span class="leaderboard-rank ${rankClasses[i] || ''}">#${i + 1}</span>
+					<span class="leaderboard-name">${escapeHtml(r.display_name)}</span>
+					<span class="leaderboard-stats">
+						<span>${r.correct}/${r.total}</span>
+						<span>${formatTime(r.time_secs)}</span>
+					</span>
+				</div>`).join('') +
+		'</div>';
+	} catch (e) {
+		container.innerHTML = '<div class="leaderboard-empty">Could not load leaderboard.</div>';
+	}
+}
+
+// ── Render questions ──────────────────────────────────────────────────
+function renderQuestions() {
+	const container = document.getElementById('questionsContainer');
+	container.innerHTML = '';
+
+	activeQuestions.forEach((q, qIndex) => {
+		const card = document.createElement('div');
+		card.className = 'question-card';
+
+		let html = `
+			<div class="question-number">Question ${qIndex + 1} of ${activeQuestions.length}</div>
+			<div class="question-text">${q.question}</div>
+		`;
+		if (q.image) html += `<img src="${q.image}" alt="Question image" class="question-image">`;
+		html += '<div class="answer-section">';
+
+		q.answers.forEach((answer, aIndex) => {
+			const key = `q${qIndex}_a${aIndex}`;
+			if (answer.label) html += `<div class="answer-label">${answer.label}</div>`;
+
+			if (answer.type === 'text-input') {
+				html += `<input type="text" class="text-input" data-question="${qIndex}" data-answer="${aIndex}" placeholder="Type your answer…">`;
+			} else if (answer.type === 'text-mc') {
+				const compact = answer.options.length >= 8;
+				html += `<div class="mc-options${compact ? ' compact' : ''}">`;
+				answer.options.forEach(option => {
+					html += `
+						<label class="mc-option${compact ? ' compact' : ''}">
+							<input type="radio" name="${key}" value="${option}" data-question="${qIndex}" data-answer="${aIndex}">
+							<span>${option}</span>
+						</label>`;
+				});
+				html += '</div>';
+			} else if (answer.type === 'image-mc') {
+				html += '<div class="image-mc-grid">';
+				answer.options.forEach((option, oIndex) => {
+					html += `
+						<label class="image-mc-option">
+							<img src="${option.image}" alt="Option ${oIndex + 1}">
+							<input type="radio" name="${key}" value="${option.value}" data-question="${qIndex}" data-answer="${aIndex}">
+						</label>`;
+				});
+				html += '</div>';
+			}
+		});
+
+		html += '</div>';
+		card.innerHTML = html;
+		container.appendChild(card);
+	});
+
+	// MC click handlers
+	container.querySelectorAll('.mc-option').forEach(opt => {
+		opt.addEventListener('click', function() {
+			this.querySelector('input[type="radio"]').checked = true;
+			this.closest('.mc-options').querySelectorAll('.mc-option').forEach(o => o.classList.remove('selected'));
+			this.classList.add('selected');
+		});
+	});
+	container.querySelectorAll('.image-mc-option').forEach(opt => {
+		opt.addEventListener('click', function() {
+			this.querySelector('input[type="radio"]').checked = true;
+			this.closest('.image-mc-grid').querySelectorAll('.image-mc-option').forEach(o => o.classList.remove('selected'));
+			this.classList.add('selected');
+		});
+	});
+
+	// Live answered count
+	container.querySelectorAll('input').forEach(input => {
+		input.addEventListener('change', updateAnsweredCount);
+	});
+}
+
+function updateAnsweredCount() {
+	let answered = 0;
+	activeQuestions.forEach((q, qi) => {
+		const allAnswered = q.answers.every((a, ai) => {
+			if (a.type === 'text-input') {
+				return document.querySelector(`input.text-input[data-question="${qi}"][data-answer="${ai}"]`)?.value.trim();
+			} else {
+				return document.querySelector(`input[type="radio"][data-question="${qi}"][data-answer="${ai}"]:checked`);
+			}
+		});
+		if (allAnswered) answered++;
+	});
+	document.getElementById('questionCount').textContent = `${answered}/${activeQuestions.length}`;
+}
+
+// ── Timer ─────────────────────────────────────────────────────────────
+function resetTimer() {
+	clearInterval(timerInterval);
+	document.getElementById('timer').textContent = '0:00';
+	startTimer();
+}
+function startTimer() {
+	startTime = Date.now();
+	timerInterval = setInterval(() => {
+		const elapsed = Math.floor((Date.now() - startTime) / 1000);
+		document.getElementById('timer').textContent = formatTime(elapsed);
+	}, 1000);
+}
+function stopTimer() { clearInterval(timerInterval); }
+function getElapsedTime() { return Math.floor((Date.now() - startTime) / 1000); }
+function formatTime(s) {
+	return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
+}
+
+// ── Grading ──────────────────────────────────────────────────────────
+function collectAnswers() {
+	const answers = {};
+	document.querySelectorAll('input.text-input').forEach(input => {
+		const q = input.dataset.question, a = input.dataset.answer;
+		if (!answers[q]) answers[q] = {};
+		answers[q][a] = input.value.trim().toLowerCase();
+	});
+	document.querySelectorAll('input[type="radio"]:checked').forEach(radio => {
+		const q = radio.dataset.question, a = radio.dataset.answer;
+		if (!answers[q]) answers[q] = {};
+		answers[q][a] = radio.value;
+	});
+	return answers;
+}
+
+function gradeQuiz(answers) {
+	let correct = 0, total = 0;
+	activeQuestions.forEach((q, qi) => {
+		q.answers.forEach((a, ai) => {
+			total++;
+			const ua = answers[qi]?.[ai];
+			if (a.type === 'text-input') {
+				const acceptable = Array.isArray(a.correct)
+					? a.correct.map(x => x.toLowerCase())
+					: [a.correct.toLowerCase()];
+				if (ua && acceptable.includes(ua)) correct++;
+			} else if (a.type === 'text-mc' || a.type === 'image-mc') {
+				if (ua === a.correct) correct++;
+			}
+		});
+	});
+	return { correct, total };
+}
+
+// ── Submit quiz ───────────────────────────────────────────────────────
+document.getElementById('submitQuiz').addEventListener('click', function() {
+	stopTimer();
+	const answers    = collectAnswers();
+	const { correct, total } = gradeQuiz(answers);
+	const timeSpent  = getElapsedTime();
+
+	pendingScore = { correct, total, timeSpent, numQuestions: selectedCount };
+
+	document.getElementById('quizContainer').classList.add('hidden');
+	document.getElementById('resultsContainer').classList.remove('hidden');
+	document.getElementById('finalScore').textContent = `${correct}/${total}`;
+	document.getElementById('resultsDetails').textContent = `Time: ${formatTime(timeSpent)}`;
+
+	// sync results leaderboard filter to the count used
+	const matchN = selectedCount === quizData.length ? 38 : selectedCount;
+	lbFilterCountResults = matchN;
+	document.querySelectorAll('#lbFilterResults .filter-btn').forEach(b => {
+		b.classList.toggle('active', parseInt(b.dataset.n) === matchN);
+	});
+	loadLeaderboard('topScoresResults', matchN);
+});
+
+// ── Modal ─────────────────────────────────────────────────────────────
+function openModal() {
+	const s = pendingScore;
+	document.getElementById('modalScorePreview').textContent =
+		`${s.correct}/${s.total} correct  ·  ${formatTime(s.timeSpent)}`;
+
+	// Pre-fill saved display name
+	const saved = localStorage.getItem('displayName') || '';
+	const input = document.getElementById('modalDisplayName');
+	input.value = saved;
+	document.getElementById('modalCharCount').textContent = saved.length;
+	document.getElementById('modalError').textContent = '';
+
+	document.getElementById('modalFormState').classList.remove('hidden');
+	document.getElementById('modalSuccessState').classList.add('hidden');
+	document.getElementById('scoreModal').classList.remove('hidden');
+	document.getElementById('modalSubmitBtn').disabled = false;
+	document.getElementById('openModalBtn').disabled = true;
+	setTimeout(() => input.focus(), 50);
+}
+
+function closeModal() {
+	document.getElementById('scoreModal').classList.add('hidden');
+	document.getElementById('openModalBtn').disabled = false;
+}
+
+document.getElementById('modalDisplayName').addEventListener('input', function() {
+	document.getElementById('modalCharCount').textContent = this.value.length;
+});
+
+async function submitScore() {
+	const name = document.getElementById('modalDisplayName').value.trim();
+	const errEl = document.getElementById('modalError');
+	errEl.textContent = '';
+
+	if (!name) { errEl.textContent = 'Please enter a display name.'; return; }
+	if (name.length > 20) { errEl.textContent = 'Max 20 characters.'; return; }
+
+	const btn = document.getElementById('modalSubmitBtn');
+	btn.disabled = true;
+	btn.textContent = 'Submitting…';
+
+	const s = pendingScore;
+	const numQ = s.numQuestions === quizData.length ? 38 : s.numQuestions;
+
+	try {
+		await sbFetch('/rest/v1/rpc/submit_score', {
+			method: 'POST',
+			body: JSON.stringify({
+				p_quiz:          'artists-works',
+				p_display_name:  name,
+				p_correct:       s.correct,
+				p_total:         s.total,
+				p_time_secs:     s.timeSpent,
+				p_num_questions: numQ
+			})
+		});
+
+		// Save display name for next time
+		localStorage.setItem('displayName', name);
+
+		document.getElementById('modalFormState').classList.add('hidden');
+		document.getElementById('modalSuccessState').classList.remove('hidden');
+		document.getElementById('modalSuccessMsg').textContent = `Score submitted as "${name}"!`;
+
+		// Refresh leaderboard
+		setTimeout(() => {
+			loadLeaderboard('topScoresResults', lbFilterCountResults);
+		}, 600);
+
+		setTimeout(closeModal, 2200);
+	} catch (e) {
+		errEl.textContent = 'Submission failed: ' + e.message;
+		btn.disabled = false;
+		btn.textContent = 'Submit';
+	}
+}
+
+// Close modal on backdrop click
+document.getElementById('scoreModal').addEventListener('click', function(e) {
+	if (e.target === this) closeModal();
+});
+
+// ── Helpers ───────────────────────────────────────────────────────────
+function escapeHtml(str) {
+	return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────
+function init() {
+	// Pick first 10 questions (shuffled)
+	const shuffled = [...quizData].sort(() => Math.random() - 0.5);
+	activeQuestions = shuffled.slice(0, 10);
+	renderQuestions();
+	document.getElementById('questionCount').textContent = `0/${activeQuestions.length}`;
+	startTimer();
+	loadLeaderboard('topScores', 10);
+}
+
+init();
+</script>
+
+<script src="/assets/settings.js"></script>
+</body>
+</html>

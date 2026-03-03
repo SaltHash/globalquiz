@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>GlobalQuiz</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+	<link rel="stylesheet" href="/assets/colors.css">
+	<script>
+		(function() {
+			try {
+				var s = JSON.parse(localStorage.getItem('quizSettings'));
+				if (s && s.isDark) document.documentElement.classList.add('dark-mode');
+				if (s && !s.isGlass) document.documentElement.classList.add('no-glass');
+			} catch(e) {}
+		})();
+	</script>
+	<style>
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+			font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+		}
+		body {
+			min-height: 100vh;
+			background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+			color: var(--text-primary);
+		}
+
+		/* Settings Toggle */
+		.settings-toggle {
+		    background: transparent;
+		    border: 1px solid var(--glass-border);
+		    color: var(--text-primary);
+		    width: 38px;
+		    height: 38px;
+		    border-radius: 8px;
+		    cursor: pointer;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    transition: all 0.2s ease;
+		    font-size: 1.2rem;
+		}
+		.settings-toggle:hover {
+		    background: var(--card-bg);
+		    border-color: var(--button-bg);
+		}
+		#settingsMenu {
+		    position: absolute;
+		    top: calc(100% + 10px);
+		    right: 0;
+		    width: 220px;
+		    background: var(--bg-gradient-end);
+		    background-image: linear-gradient(var(--card-bg), var(--card-bg));
+		    border: 1px solid var(--card-border);
+		    padding: 1.25rem;
+		    border-radius: 12px;
+		    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+		    display: none;
+		    animation: fadeIn 0.2s ease-out;
+		}
+		@keyframes fadeIn {
+		    from { opacity: 0; transform: translateY(-10px); }
+		    to { opacity: 1; transform: translateY(0); }
+		}
+		#settingsMenu h4 {
+		    margin-bottom: 1rem;
+		    font-size: 0.9rem;
+		    text-transform: uppercase;
+		    letter-spacing: 1px;
+		    color: var(--button-bg);
+		}
+		.setting-item {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    margin-bottom: 0.75rem;
+		    font-size: 0.95rem;
+		}
+		.switch {
+		    position: relative;
+		    display: inline-block;
+		    width: 40px;
+		    height: 20px;
+		}
+		.switch input { opacity: 0; width: 0; height: 0; }
+		.slider {
+		    position: absolute;
+		    cursor: pointer;
+		    top: 0; left: 0; right: 0; bottom: 0;
+		    background-color: var(--glass-border);
+		    transition: .4s;
+		    border-radius: 20px;
+		}
+		.slider:before {
+		    position: absolute;
+		    content: "";
+		    height: 14px; width: 14px;
+		    left: 3px; bottom: 3px;
+		    background-color: white;
+		    transition: .4s;
+		    border-radius: 50%;
+		}
+		input:checked + .slider { background-color: var(--button-bg); }
+		input:checked + .slider:before { transform: translateX(20px); }
+
+		/* Navbar */
+		nav, .quiz-card {
+		    backdrop-filter: var(--blur-val) !important;
+		    -webkit-backdrop-filter: var(--blur-val) !important;
+		}
+		nav {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    position: sticky;
+		    top: 0;
+		    background: var(--glass-bg);
+		    border-bottom: 1px solid var(--glass-border);
+		    padding: 0.75rem 2rem;
+		    z-index: 1000;
+		}
+		.nav-left {
+			display: flex;
+			align-items: center;
+			gap: 1.5rem;
+		}
+		.nav-title {
+			font-size: 1.2rem;
+			font-weight: 700;
+			text-decoration: none;
+			color: var(--text-primary);
+		}
+		.nav-links {
+			display: flex;
+			gap: 0.25rem;
+		}
+		.nav-link {
+			font-size: 0.95rem;
+			font-weight: 500;
+			color: var(--text-secondary);
+			text-decoration: none;
+			padding: 0.3rem 0.7rem;
+			border-radius: 6px;
+			transition: all 0.2s;
+		}
+		.nav-link:hover {
+			color: var(--text-primary);
+			background: var(--card-bg);
+		}
+
+		main {
+			max-width: 1100px;
+			margin: 0 auto;
+			padding: 3rem 2rem;
+		}
+		.description {
+			font-size: 1.5rem;
+			text-align: center;
+			color: var(--text-primary);
+			margin-bottom: 2.5rem;
+		}
+		.quiz-grid {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 1.5rem;
+		}
+		.quiz-card {
+			background: var(--card-bg);
+			border: 1px solid var(--card-border);
+			border-radius: 12px;
+			padding: 1.5rem;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+		}
+		.quiz-card h3 {
+			margin-bottom: 0.5rem;
+			font-size: 1.1rem;
+		}
+		.quiz-card p {
+			font-size: 0.95rem;
+			color: var(--text-secondary);
+			margin-bottom: 1.2rem;
+		}
+		.quiz-card a {
+			align-self: flex-start;
+			background-color: var(--button-bg);
+			color: var(--button-text);
+			padding: 0.5rem 1.1rem;
+			border-radius: 6px;
+			font-weight: 600;
+			text-decoration: none;
+			transition: background-color 0.2s;
+		}
+		.quiz-card a:hover { background-color: var(--button-hover); }
+
+		@media (max-width: 900px) { .quiz-grid { grid-template-columns: repeat(2, 1fr); } }
+		@media (max-width: 600px) {
+			.quiz-grid { grid-template-columns: 1fr; }
+			.nav-links { display: none; }
+		}
+	</style>
+</head>
+<body>
+	<nav>
+	    <div class="nav-left">
+	    	<a class="nav-title" href="/">GlobalQuiz</a>
+	    	<div class="nav-links">
+	    		<a class="nav-link" href="/artists-works">Artists &amp; Works</a>
+	    	</div>
+	    </div>
+	    <div style="position: relative;">
+	        <button class="settings-toggle" onclick="toggleSettingsMenu()">⚙️</button>
+	        <div id="settingsMenu">
+	            <h4>Preferences</h4>
+	            <div class="setting-item">
+	                <span>Dark Mode</span>
+	                <label class="switch">
+	                    <input type="checkbox" id="darkModeToggle" onchange="updateSettings()">
+	                    <span class="slider"></span>
+	                </label>
+	            </div>
+	            <div class="setting-item">
+	                <span>Glass Effect</span>
+	                <label class="switch">
+	                    <input type="checkbox" id="glassToggle" checked onchange="updateSettings()">
+	                    <span class="slider"></span>
+	                </label>
+	            </div>
+	        </div>
+	    </div>
+	</nav>
+
+	<main>
+		<div class="description">
+			Take quizzes and get placed on a global leaderboard!
+		</div>
+		<div class="quiz-grid">
+			<div class="quiz-card">
+				<h3>Artists and Works</h3>
+				<p>Identify information about a painting from its picture.</p>
+				<a href="/artists-works">Play</a>
+			</div>
+		</div>
+	</main>
+
+	<script src="/assets/settings.js"></script>
+</body>
+</html>
