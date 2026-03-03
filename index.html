@@ -754,6 +754,45 @@ function selectMC(btn){
   btn.classList.add('selected');
 }
 
+function normalizeAnswerText(text){
+  return (text||'')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase()
+    .trim();
+}
+
+function levenshteinDistance(a,b){
+  if(a===b) return 0;
+  if(!a.length) return b.length;
+  if(!b.length) return a.length;
+  const dp=Array(b.length+1).fill(0).map((_,i)=>i);
+  for(let i=1;i<=a.length;i++){
+    let prev=dp[0];
+    dp[0]=i;
+    for(let j=1;j<=b.length;j++){
+      const temp=dp[j];
+      const cost=a[i-1]===b[j-1]?0:1;
+      dp[j]=Math.min(
+        dp[j]+1,
+        dp[j-1]+1,
+        prev+cost
+      );
+      prev=temp;
+    }
+  }
+  return dp[b.length];
+}
+
+function isAnswerNinetyPercentCorrect(input, correct){
+  const user=normalizeAnswerText(input);
+  const expected=normalizeAnswerText(correct);
+  if(!user || !expected) return false;
+  const maxLen=Math.max(user.length, expected.length);
+  const distance=levenshteinDistance(user, expected);
+  return ((maxLen-distance)/maxLen) >= 0.9;
+}
+
 function submitQuiz(){
   if(quizState.submitted)return;
   quizState.submitted=true;
@@ -763,9 +802,7 @@ function submitQuiz(){
   q.answers.forEach((ans,ai)=>{
     if(ans.type==='text-input'){
       const input=document.getElementById(`qf-${ai}`);
-      const val=input.value.trim().toLowerCase();
-      const cor=ans.correct.toLowerCase();
-      const ok=val===cor||(cor.includes(val)&&val.length>3);
+      const ok=isAnswerNinetyPercentCorrect(input.value, ans.correct);
       input.classList.add(ok?'correct':'wrong');
       if(!ok){
         allCorrect=false;
