@@ -1055,7 +1055,8 @@ function initTimeline(){
   orderedEras.forEach(era=>{
     html+=`<div class="tl-era"><div class="tl-era-title">${era}</div><div class="tl-grid">`;
     groups[era].forEach(c=>{
-      html+=`<div class="tl-item" onclick='openModal(${JSON.stringify(c)})'>
+      const cardIndex = CARDS.indexOf(c);
+      html+=`<div class="tl-item" onclick="openModalByIndex(${cardIndex})">
         <img src="${c.image}" alt="${c.name}">
         <div class="tl-item-date">${getDateStr(c)}</div>
         <div class="tl-item-title">${c.name}</div>
@@ -1068,8 +1069,12 @@ function initTimeline(){
 }
 
 // ─── MODAL ───────────────────────────────────────────
+function openModalByIndex(index){
+  openModal(CARDS[index]);
+}
+
 function openModal(card){
-  if(typeof card==='string')card=JSON.parse(card);
+  if(!card)return;
   document.getElementById('modal-img').src=card.image;
   document.getElementById('modal-title').textContent=card.name;
   document.getElementById('modal-meta').textContent=`${card.artist}  ·  ${getDateStr(card)}`;
