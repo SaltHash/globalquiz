@@ -50,7 +50,7 @@
   h2.page-title span { color: var(--text-dim); font-size: 12px; font-weight: 400; }
 
   /* HOME */
-  .home-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .home-title { font-size: 22px; font-weight: 700; margin-bottom: 16px; }
   .home-sub { font-size: 13px; color: var(--text-dim); margin-bottom: 24px; }
   .home-sub span { color: var(--purple); }
   .home-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 28px; }
@@ -313,7 +313,6 @@
 
 <div class="page active" id="page-home">
   <div class="home-title">AP Euro Art History</div>
-  <div class="home-sub"><span id="home-count">36</span> works · <span>6 centuries</span></div>
   <div id="streak-bar-wrap"></div>
   <div class="home-grid">
     <div class="home-card" onclick="showPage('quiz')">
@@ -674,7 +673,7 @@ function initQuizSetup() {
         <button class="quiz-mode-btn${quizMode==='normal'?' active':''}" onclick="setQuizMode('normal',this)">
           <div class="mode-icon">📝</div>
           <div class="mode-name">Normal</div>
-          <div class="mode-desc">Random questions from all 36 works</div>
+          <div class="mode-desc">Random questions from all 38 works</div>
         </button>
         <button class="quiz-mode-btn${quizMode==='wrong'?' active':''}" onclick="setQuizMode('wrong',this)" ${!hasWrong?'disabled style="opacity:0.4;cursor:not-allowed"':''}>
           <div class="mode-icon">🔁</div>
