@@ -241,7 +241,13 @@
   .fc-done h3 { font-size: 18px; margin-bottom: 10px; }
   .fc-done p { font-size: 13px; color: var(--text-dim); margin-bottom: 20px; }
   .fc-info { font-size: 12px; color: var(--text-dim); text-align: center; }
-
+  .fc-top-controls { display: flex; justify-content: center; margin-bottom: 10px; }
+  .fc-back-btn {
+    border: 1px solid var(--border); background: var(--bg3); color: var(--text);
+    border-radius: 10px; font-family: 'Monda', sans-serif; font-size: 11px;
+    padding: 8px 12px; cursor: pointer; transition: all 0.15s;
+  }
+  .fc-back-btn:hover { border-color: var(--purple); color: var(--purple); background: var(--purple-dim); }
   /* TIMELINE */
   .tl-era { margin-bottom: 30px; }
   .tl-era-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--purple); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
@@ -915,7 +921,7 @@ function initFlashcards(){
   if(!fcState){
     const deck=CARDS.map((c,i)=>({...c,id:i,status:'dontknow',due:Date.now(),interval:1}));
     if(saved){ saved.forEach(s=>{ const d=deck.find(c=>c.id===s.id); if(d){d.status=s.status;d.interval=s.interval;d.due=s.due;} }); }
-    fcState={ deck, queue:[], current:null, flipped:false };
+    fcState={ deck, queue:[], current:null, flipped:false, history:[] };
     buildFcQueue();
   }
   renderFCStats(); renderFC();
@@ -924,6 +930,36 @@ function initFlashcards(){
 function buildFcQueue(){
   const pri={dontknow:0,kinda:1,know:2};
   fcState.queue=[...fcState.deck].sort((a,b)=>pri[a.status]-pri[b.status]||a.due-b.due);
+}
+
+function pushFCHistory(){
+  fcState.history.push({
+    deck: fcState.deck.map(c=>({id:c.id,status:c.status,interval:c.interval,due:c.due})),
+    queueIds: fcState.queue.map(c=>c.id),
+    currentId: fcState.current ? fcState.current.id : null,
+  });
+}
+
+function goBackCard(){
+  if(!fcState || !fcState.history.length) return;
+  const snap=fcState.history.pop();
+  snap.deck.forEach(s=>{
+    const d=fcState.deck.find(c=>c.id===s.id);
+    if(d){ d.status=s.status; d.interval=s.interval; d.due=s.due; }
+  });
+  const byId=new Map(fcState.deck.map(c=>[c.id,c]));
+  fcState.queue=snap.queueIds.map(id=>byId.get(id)).filter(Boolean);
+  if(!fcState.queue.length) buildFcQueue();
+  if(snap.currentId!==null){
+    const idx=fcState.queue.findIndex(c=>c.id===snap.currentId);
+    if(idx>0){
+      const prev=fcState.queue.splice(idx,1)[0];
+      fcState.queue.unshift(prev);
+    }
+  }
+  saveFCState(fcState.deck);
+  renderFCStats();
+  renderFC();
 }
 
 function renderFCStats(){
@@ -946,6 +982,7 @@ function renderFC(){
   const card=fcState.queue[0]; fcState.current=card; fcState.flipped=false;
   const remaining=fcState.deck.filter(c=>c.status!=='know').length;
   w.innerHTML=`
+    <div class="fc-top-controls">${fcState.history.length?'<button class="fc-back-btn" onclick="goBackCard()">&larr; Back</button>':''}</div>
     <div class="fc-info" style="margin-bottom:12px">${remaining} cards remaining · click card to reveal</div>
     <div class="fc-card-container">
       <div class="fc-card" id="fc-card" onclick="flipCard()">
@@ -975,6 +1012,8 @@ function flipCard(){
 
 function rateCard(rating){
   const card=fcState.current;
+  if(!card) return;
+  pushFCHistory();
   const d=fcState.deck.find(c=>c.id===card.id);
   d.status=rating; d.interval={dontknow:1,kinda:3,know:99}[rating];
   d.due=Date.now()+d.interval*1000;
@@ -1265,28 +1304,55 @@ function finishSpeed() {
 
 // ─── MATCH ───────────────────────────────────────────
 let matchState=null;
+let matchSetupMode='title';
+
+function setMatchMode(mode){
+  matchSetupMode=mode;
+  initMatch();
+}
+
+function getMatchLabel(card,mode){
+  if(mode==='artist') return card.artist || 'Unknown Artist';
+  if(mode==='era') return card.era || 'Unknown Era';
+  return card.name || 'Untitled';
+}
+
+function getMatchModeLabel(mode){
+  if(mode==='artist') return 'Author';
+  if(mode==='era') return 'Era';
+  return 'Title';
+}
 
 function initMatch(){
   document.getElementById('match-wrapper').innerHTML=`
     <div style="text-align:center;padding:40px 0">
       <div style="font-size:40px;margin-bottom:16px">⚡</div>
       <h3 style="font-size:17px;margin-bottom:8px">Match Game</h3>
-      <p style="font-size:13px;color:var(--text-dim);margin-bottom:24px">Match artwork images to their titles. Race the clock!</p>
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:14px">Match artwork images to the correct title, author, or era. Race the clock!</p>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px">
+        ${['title','artist','era'].map(mode=>`
+          <button class="btn ${matchSetupMode===mode?'':'outline'} sm" onclick="setMatchMode('${mode}')">${getMatchModeLabel(mode)}</button>
+        `).join('')}
+      </div>
       <div style="display:flex;gap:10px;justify-content:center">
-        <button class="btn" onclick="startMatch(6,'Easy')">6 Pairs · Easy</button>
-        <button class="btn outline" onclick="startMatch(10,'Hard')">10 Pairs · Hard</button>
+        <button class="btn" onclick="startMatch(6,'Easy',matchSetupMode)">6 Pairs · Easy</button>
+        <button class="btn outline" onclick="startMatch(10,'Hard',matchSetupMode)">10 Pairs · Hard</button>
       </div>
     </div>
   `;
   matchState=null;
 }
 
-function startMatch(n,difficulty){
+function startMatch(n,difficulty,mode='title'){
   const sel=[...CARDS].sort(()=>Math.random()-0.5).slice(0,n);
   const tiles=[];
-  sel.forEach(c=>{tiles.push({id:c.name,type:'image',card:c});tiles.push({id:c.name,type:'label',card:c});});
+  sel.forEach((c,i)=>{
+    const value=getMatchLabel(c,mode);
+    tiles.push({matchValue:value,type:'image',card:c});
+    tiles.push({matchValue:value,type:'label',label:value,card:c});
+  });
   tiles.sort(()=>Math.random()-0.5);
-  matchState={tiles,selected:[],matched:new Set(),startTime:Date.now(),timer:null,n,difficulty};
+  matchState={tiles,selected:[],matched:new Set(),startTime:Date.now(),timer:null,n,difficulty,mode};
   renderMatch();
   matchState.timer=setInterval(updateMatchTimer,100);
 }
@@ -1300,17 +1366,18 @@ function updateMatchTimer(){
 function renderMatch(){
   const {tiles,matched,n}=matchState;
   const cols=n<=6?4:5;
+  const matchedPairs=Math.floor(matched.size/2);
   document.getElementById('match-wrapper').innerHTML=`
     <div class="match-header">
-      <div style="font-size:13px;color:var(--text-dim)">${matched.size} / ${n} matched</div>
+      <div style="font-size:13px;color:var(--text-dim)">${matchedPairs} / ${n} matched</div>
       <div class="match-timer" id="match-timer">0.0s</div>
       <button class="btn outline sm" onclick="initMatch()">✕ Quit</button>
     </div>
     <div class="match-grid" style="grid-template-columns:repeat(${cols},1fr)">
       ${tiles.map((t,i)=>{
-        const isM=matched.has(t.id);
+        const isM=matched.has(i);
         return `<div class="match-tile${isM?' matched':''}" data-idx="${i}" onclick="clickMatchTile(${i})">
-          ${t.type==='image'?`<img src="${t.card.image}" alt="">`:`<div class="tile-label">${t.card.name}</div>`}
+          ${t.type==='image'?`<img src="${t.card.image}" alt="">`:`<div class="tile-label">${t.label}</div>`}
         </div>`;
       }).join('')}
     </div>
@@ -1320,17 +1387,19 @@ function renderMatch(){
 function clickMatchTile(idx){
   const{tiles,selected,matched}=matchState;
   const tile=tiles[idx];
-  if(matched.has(tile.id)||( selected.length===1&&selected[0]===idx))return;
+  if(matched.has(idx)||( selected.length===1&&selected[0]===idx))return;
   document.querySelector(`.match-tile[data-idx="${idx}"]`)?.classList.add('selected');
   selected.push(idx);
   if(selected.length===2){
     clearInterval(matchState.timer);
     const[a,b]=selected,ta=tiles[a],tb=tiles[b];
-    if(ta.id===tb.id&&ta.type!==tb.type){
-      matched.add(ta.id); matchState.selected=[];
+    if(ta.matchValue===tb.matchValue&&ta.type!==tb.type){
+      matched.add(a);
+      matched.add(b);
+      matchState.selected=[];
       setTimeout(()=>{
         renderMatch();
-        if(matched.size===matchState.n)finishMatch();
+        if(matched.size===matchState.n*2)finishMatch();
         else matchState.timer=setInterval(updateMatchTimer,100);
       },400);
     } else {
@@ -1349,9 +1418,9 @@ function finishMatch(){
       <div style="font-size:40px;margin-bottom:12px">🎉</div>
       <h3>All matched!</h3>
       <div class="time">${elapsed}s</div>
-      <p>${matchState.n} pairs · ${elapsed<30?'🔥 Blazing fast!':elapsed<60?'✓ Nice work!':'Keep practicing!'}</p>
+      <p>${matchState.n} ${getMatchModeLabel(matchState.mode)} pairs · ${elapsed<30?'🔥 Blazing fast!':elapsed<60?'✓ Nice work!':'Keep practicing!'}</p>
       <div style="display:flex;gap:10px;justify-content:center">
-        <button class="btn" onclick="startMatch(${matchState.n},'${matchState.difficulty}')">Play Again</button>
+        <button class="btn" onclick="startMatch(${matchState.n},'${matchState.difficulty}','${matchState.mode}')">Play Again</button>
         <button class="btn outline" onclick="initMatch()">Change Difficulty</button>
       </div>
     </div>
@@ -1359,8 +1428,8 @@ function finishMatch(){
 }
 
 // ─── INIT ────────────────────────────────────────────
-document.getElementById('home-count').textContent=CARDS.length;
 renderHomeStats();
 </script>
 </body>
 </html>
+
