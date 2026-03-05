@@ -1265,28 +1265,55 @@ function finishSpeed() {
 
 // ─── MATCH ───────────────────────────────────────────
 let matchState=null;
+let matchSetupMode='title';
+
+function setMatchMode(mode){
+  matchSetupMode=mode;
+  initMatch();
+}
+
+function getMatchLabel(card,mode){
+  if(mode==='artist') return card.artist || 'Unknown Artist';
+  if(mode==='era') return card.era || 'Unknown Era';
+  return card.name || 'Untitled';
+}
+
+function getMatchModeLabel(mode){
+  if(mode==='artist') return 'Author';
+  if(mode==='era') return 'Era';
+  return 'Title';
+}
 
 function initMatch(){
   document.getElementById('match-wrapper').innerHTML=`
     <div style="text-align:center;padding:40px 0">
       <div style="font-size:40px;margin-bottom:16px">⚡</div>
       <h3 style="font-size:17px;margin-bottom:8px">Match Game</h3>
-      <p style="font-size:13px;color:var(--text-dim);margin-bottom:24px">Match artwork images to their titles. Race the clock!</p>
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:14px">Match artwork images to the correct title, author, or era. Race the clock!</p>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px">
+        ${['title','artist','era'].map(mode=>`
+          <button class="btn ${matchSetupMode===mode?'':'outline'} sm" onclick="setMatchMode('${mode}')">${getMatchModeLabel(mode)}</button>
+        `).join('')}
+      </div>
       <div style="display:flex;gap:10px;justify-content:center">
-        <button class="btn" onclick="startMatch(6,'Easy')">6 Pairs · Easy</button>
-        <button class="btn outline" onclick="startMatch(10,'Hard')">10 Pairs · Hard</button>
+        <button class="btn" onclick="startMatch(6,'Easy',matchSetupMode)">6 Pairs · Easy</button>
+        <button class="btn outline" onclick="startMatch(10,'Hard',matchSetupMode)">10 Pairs · Hard</button>
       </div>
     </div>
   `;
   matchState=null;
 }
 
-function startMatch(n,difficulty){
+function startMatch(n,difficulty,mode='title'){
   const sel=[...CARDS].sort(()=>Math.random()-0.5).slice(0,n);
   const tiles=[];
-  sel.forEach(c=>{tiles.push({id:c.name,type:'image',card:c});tiles.push({id:c.name,type:'label',card:c});});
+  sel.forEach((c,i)=>{
+    const value=getMatchLabel(c,mode);
+    tiles.push({matchValue:value,type:'image',card:c});
+    tiles.push({matchValue:value,type:'label',label:value,card:c});
+  });
   tiles.sort(()=>Math.random()-0.5);
-  matchState={tiles,selected:[],matched:new Set(),startTime:Date.now(),timer:null,n,difficulty};
+  matchState={tiles,selected:[],matched:new Set(),startTime:Date.now(),timer:null,n,difficulty,mode};
   renderMatch();
   matchState.timer=setInterval(updateMatchTimer,100);
 }
@@ -1300,17 +1327,18 @@ function updateMatchTimer(){
 function renderMatch(){
   const {tiles,matched,n}=matchState;
   const cols=n<=6?4:5;
+  const matchedPairs=Math.floor(matched.size/2);
   document.getElementById('match-wrapper').innerHTML=`
     <div class="match-header">
-      <div style="font-size:13px;color:var(--text-dim)">${matched.size} / ${n} matched</div>
+      <div style="font-size:13px;color:var(--text-dim)">${matchedPairs} / ${n} matched</div>
       <div class="match-timer" id="match-timer">0.0s</div>
       <button class="btn outline sm" onclick="initMatch()">✕ Quit</button>
     </div>
     <div class="match-grid" style="grid-template-columns:repeat(${cols},1fr)">
       ${tiles.map((t,i)=>{
-        const isM=matched.has(t.id);
+        const isM=matched.has(i);
         return `<div class="match-tile${isM?' matched':''}" data-idx="${i}" onclick="clickMatchTile(${i})">
-          ${t.type==='image'?`<img src="${t.card.image}" alt="">`:`<div class="tile-label">${t.card.name}</div>`}
+          ${t.type==='image'?`<img src="${t.card.image}" alt="">`:`<div class="tile-label">${t.label}</div>`}
         </div>`;
       }).join('')}
     </div>
@@ -1320,17 +1348,19 @@ function renderMatch(){
 function clickMatchTile(idx){
   const{tiles,selected,matched}=matchState;
   const tile=tiles[idx];
-  if(matched.has(tile.id)||( selected.length===1&&selected[0]===idx))return;
+  if(matched.has(idx)||( selected.length===1&&selected[0]===idx))return;
   document.querySelector(`.match-tile[data-idx="${idx}"]`)?.classList.add('selected');
   selected.push(idx);
   if(selected.length===2){
     clearInterval(matchState.timer);
     const[a,b]=selected,ta=tiles[a],tb=tiles[b];
-    if(ta.id===tb.id&&ta.type!==tb.type){
-      matched.add(ta.id); matchState.selected=[];
+    if(ta.matchValue===tb.matchValue&&ta.type!==tb.type){
+      matched.add(a);
+      matched.add(b);
+      matchState.selected=[];
       setTimeout(()=>{
         renderMatch();
-        if(matched.size===matchState.n)finishMatch();
+        if(matched.size===matchState.n*2)finishMatch();
         else matchState.timer=setInterval(updateMatchTimer,100);
       },400);
     } else {
@@ -1349,9 +1379,9 @@ function finishMatch(){
       <div style="font-size:40px;margin-bottom:12px">🎉</div>
       <h3>All matched!</h3>
       <div class="time">${elapsed}s</div>
-      <p>${matchState.n} pairs · ${elapsed<30?'🔥 Blazing fast!':elapsed<60?'✓ Nice work!':'Keep practicing!'}</p>
+      <p>${matchState.n} ${getMatchModeLabel(matchState.mode)} pairs · ${elapsed<30?'🔥 Blazing fast!':elapsed<60?'✓ Nice work!':'Keep practicing!'}</p>
       <div style="display:flex;gap:10px;justify-content:center">
-        <button class="btn" onclick="startMatch(${matchState.n},'${matchState.difficulty}')">Play Again</button>
+        <button class="btn" onclick="startMatch(${matchState.n},'${matchState.difficulty}','${matchState.mode}')">Play Again</button>
         <button class="btn outline" onclick="initMatch()">Change Difficulty</button>
       </div>
     </div>
