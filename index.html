@@ -1037,34 +1037,21 @@ function getDateStr(c){ return DATE_MAP[c.name]||''; }
 
 function initTimeline(){
   const w=document.getElementById('timeline-wrapper');
-  // Group cards by their AP era (from card.era), preserve ERA_ORDER ordering
-  const groups={};
-  CARDS.forEach(c=>{
-    const era=getStyle(c);
-    if(!groups[era])groups[era]=[];
-    groups[era].push(c);
-  });
-  // Sort cards within each era by date
-  Object.values(groups).forEach(arr=>arr.sort((a,b)=>{
+  const sortedCards=[...CARDS].sort((a,b)=>{
     const da=parseInt(DATE_MAP[a.name])||0;
     const db=parseInt(DATE_MAP[b.name])||0;
     return da-db;
-  }));
-  // Output in ERA_ORDER order, then any leftover eras appended
-  const orderedEras=[...ERA_ORDER.filter(e=>groups[e]),...Object.keys(groups).filter(e=>!ERA_ORDER.includes(e))];
-  let html='';
-  orderedEras.forEach(era=>{
-    html+=`<div class="tl-era"><div class="tl-era-title">${era}</div><div class="tl-grid">`;
-    groups[era].forEach(c=>{
-      html+=`<div class="tl-item" onclick='openModal(${JSON.stringify(c)})'>
-        <img src="${c.image}" alt="${c.name}">
-        <div class="tl-item-date">${getDateStr(c)}</div>
-        <div class="tl-item-title">${c.name}</div>
-        <div class="tl-item-artist">${c.artist}</div>
-      </div>`;
-    });
-    html+='</div></div>';
   });
+  let html='<div class="tl-era"><div class="tl-era-title">Chronological</div><div class="tl-grid">';
+  sortedCards.forEach(c=>{
+    html+=`<div class="tl-item" onclick='openModal(${JSON.stringify(c)})'>
+      <img src="${c.image}" alt="${c.name}">
+      <div class="tl-item-date">${getDateStr(c)}</div>
+      <div class="tl-item-title">${c.name}</div>
+      <div class="tl-item-artist">${c.artist}</div>
+    </div>`;
+  });
+  html+='</div></div>';
   w.innerHTML=html;
 }
 
