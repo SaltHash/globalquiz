@@ -21,7 +21,15 @@
     --yellow: #fbbf24;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Monda', sans-serif; min-height: 100vh; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Monda', sans-serif;
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+  }
   nav {
     background: var(--bg2); border-bottom: 1px solid var(--border);
     padding: 0 24px; display: flex; align-items: center; gap: 4px;
@@ -297,6 +305,24 @@
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .site {
+    min-height: calc(100vh - 56px); /* subtract nav height */
+    display: flex;
+    flex-direction: column;
+  }
+
+  footer {
+    min-height: 100px;
+    width: 100%;
+    color: #ccc;
+    background: rgba(255, 255, 255, 0.03);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: auto;
+  }
 </style>
 </head>
 <body>
@@ -311,105 +337,111 @@
   <button onclick="showPage('match')">Match</button>
 </nav>
 
-<div class="page active" id="page-home">
-  <div class="home-title">AP Euro Art History</div>
-  <div class="home-sub"><span id="home-count">36</span> works · <span>6 centuries</span></div>
-  <div id="streak-bar-wrap"></div>
-  <div class="home-grid">
-    <div class="home-card" onclick="showPage('quiz')">
-      <div class="icon">📝</div><h3>Practice Quiz</h3>
-      <p>See the artwork, identify name, artist, era, and significance. Choose how many questions.</p>
+<div id="page-content">
+  <div class="page active" id="page-home">
+    <div class="home-title">AP Euro Art History</div>
+    <div class="home-sub"><span id="home-count">36</span> works · <span>6 centuries</span></div>
+    <div id="streak-bar-wrap"></div>
+    <div class="home-grid">
+      <div class="home-card" onclick="showPage('quiz')">
+        <div class="icon">📝</div><h3>Practice Quiz</h3>
+        <p>See the artwork, identify name, artist, era, and significance. Choose how many questions.</p>
+      </div>
+      <div class="home-card" onclick="showPage('speed')">
+        <div class="icon">⚡</div><h3>Speed Round</h3>
+        <p>10 seconds per question. Buzzer-style pressure. Trains fast recall before the exam.</p>
+      </div>
+      <div class="home-card" onclick="showPage('flashcards')">
+        <div class="icon">🃏</div><h3>Flashcards</h3>
+        <p>Spaced repetition. Rate yourself — Know, Kinda, Don't Know. Hard cards come back sooner.</p>
+      </div>
+      <div class="home-card" onclick="showPage('timeline')">
+        <div class="icon">📅</div><h3>Timeline Browse</h3>
+        <p>Browse all works grouped by AP era. Click any for full details.</p>
+      </div>
+      <div class="home-card" onclick="showPage('match')">
+        <div class="icon">🧩</div><h3>Match Game</h3>
+        <p>Match artwork images to titles. Race the clock and beat your best time.</p>
+      </div>
     </div>
-    <div class="home-card" onclick="showPage('speed')">
-      <div class="icon">⚡</div><h3>Speed Round</h3>
-      <p>10 seconds per question. Buzzer-style pressure. Trains fast recall before the exam.</p>
+
+    <div class="stats-section">
+      <div class="stats-collapse-header" id="quiz-stats-hdr" onclick="toggleSection('quiz-stats')">
+        <div class="stats-collapse-title"><div class="dot"></div>Quiz History</div>
+        <div class="stats-collapse-arrow">▼</div>
+      </div>
+      <div class="stats-collapse-body" id="quiz-stats-body">
+        <div class="graph-wrap" id="quiz-graph-wrap"></div>
+        <div id="quiz-hist-list"></div>
+      </div>
     </div>
-    <div class="home-card" onclick="showPage('flashcards')">
-      <div class="icon">🃏</div><h3>Flashcards</h3>
-      <p>Spaced repetition. Rate yourself — Know, Kinda, Don't Know. Hard cards come back sooner.</p>
+
+    <div class="stats-section">
+      <div class="stats-collapse-header" id="match-stats-hdr" onclick="toggleSection('match-stats')">
+        <div class="stats-collapse-title"><div class="dot"></div>Match Game Records</div>
+        <div class="stats-collapse-arrow">▼</div>
+      </div>
+      <div class="stats-collapse-body" id="match-stats-body">
+        <div id="match-hist-list"></div>
+      </div>
     </div>
-    <div class="home-card" onclick="showPage('timeline')">
-      <div class="icon">📅</div><h3>Timeline Browse</h3>
-      <p>Browse all works grouped by AP era. Click any for full details.</p>
-    </div>
-    <div class="home-card" onclick="showPage('match')">
-      <div class="icon">🧩</div><h3>Match Game</h3>
-      <p>Match artwork images to titles. Race the clock and beat your best time.</p>
+
+    <div class="stats-section">
+      <div class="stats-collapse-header" id="fc-stats-hdr" onclick="toggleSection('fc-stats')">
+        <div class="stats-collapse-title"><div class="dot"></div>Flashcard Progress</div>
+        <div class="stats-collapse-arrow">▼</div>
+      </div>
+      <div class="stats-collapse-body" id="fc-stats-body">
+        <div id="fc-prog-display"></div>
+      </div>
     </div>
   </div>
 
-  <div class="stats-section">
-    <div class="stats-collapse-header" id="quiz-stats-hdr" onclick="toggleSection('quiz-stats')">
-      <div class="stats-collapse-title"><div class="dot"></div>Quiz History</div>
-      <div class="stats-collapse-arrow">▼</div>
-    </div>
-    <div class="stats-collapse-body" id="quiz-stats-body">
-      <div class="graph-wrap" id="quiz-graph-wrap"></div>
-      <div id="quiz-hist-list"></div>
-    </div>
+  <div class="page" id="page-quiz">
+    <h2 class="page-title">Practice Quiz <span id="quiz-mode-label"></span></h2>
+    <div id="quiz-wrapper"></div>
   </div>
 
-  <div class="stats-section">
-    <div class="stats-collapse-header" id="match-stats-hdr" onclick="toggleSection('match-stats')">
-      <div class="stats-collapse-title"><div class="dot"></div>Match Game Records</div>
-      <div class="stats-collapse-arrow">▼</div>
+  <div class="page" id="page-flashcards">
+    <h2 class="page-title">Flashcards <span><button class="btn outline sm" onclick="shuffleFC()" style="font-size:11px">🔀 Shuffle</button></span></h2>
+    <div class="fc-status-bar">
+      <div class="fc-status-pill know"><div class="num" id="fc-know-count">0</div><div class="lbl">Know ✓</div></div>
+      <div class="fc-status-pill kinda"><div class="num" id="fc-kinda-count">0</div><div class="lbl">Kinda ~</div></div>
+      <div class="fc-status-pill dontknow"><div class="num" id="fc-dk-count">0</div><div class="lbl">Don't Know ✗</div></div>
     </div>
-    <div class="stats-collapse-body" id="match-stats-body">
-      <div id="match-hist-list"></div>
-    </div>
+    <div id="fc-wrapper"></div>
   </div>
 
-  <div class="stats-section">
-    <div class="stats-collapse-header" id="fc-stats-hdr" onclick="toggleSection('fc-stats')">
-      <div class="stats-collapse-title"><div class="dot"></div>Flashcard Progress</div>
-      <div class="stats-collapse-arrow">▼</div>
+  <div class="page" id="page-timeline">
+    <h2 class="page-title">Timeline Browse</h2>
+    <div id="timeline-wrapper"></div>
+  </div>
+
+  <div class="page" id="page-match">
+    <h2 class="page-title">Match Game</h2>
+    <div id="match-wrapper"></div>
+  </div>
+
+  <div class="page" id="page-speed">
+    <h2 class="page-title">Speed Round <span id="speed-mode-label"></span></h2>
+    <div id="speed-wrapper"></div>
+  </div>
+
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">✕ Close</button>
+      <img id="modal-img" class="modal-img" src="" alt="">
+      <div id="modal-era" class="modal-era"></div>
+      <div id="modal-title" class="modal-title"></div>
+      <div id="modal-meta" class="modal-meta"></div>
+      <div id="modal-sig" class="modal-sig"></div>
     </div>
-    <div class="stats-collapse-body" id="fc-stats-body">
-      <div id="fc-prog-display"></div>
-    </div>
   </div>
 </div>
 
-<div class="page" id="page-quiz">
-  <h2 class="page-title">Practice Quiz <span id="quiz-mode-label"></span></h2>
-  <div id="quiz-wrapper"></div>
-</div>
-
-<div class="page" id="page-flashcards">
-  <h2 class="page-title">Flashcards <span><button class="btn outline sm" onclick="shuffleFC()" style="font-size:11px">🔀 Shuffle</button></span></h2>
-  <div class="fc-status-bar">
-    <div class="fc-status-pill know"><div class="num" id="fc-know-count">0</div><div class="lbl">Know ✓</div></div>
-    <div class="fc-status-pill kinda"><div class="num" id="fc-kinda-count">0</div><div class="lbl">Kinda ~</div></div>
-    <div class="fc-status-pill dontknow"><div class="num" id="fc-dk-count">0</div><div class="lbl">Don't Know ✗</div></div>
-  </div>
-  <div id="fc-wrapper"></div>
-</div>
-
-<div class="page" id="page-timeline">
-  <h2 class="page-title">Timeline Browse</h2>
-  <div id="timeline-wrapper"></div>
-</div>
-
-<div class="page" id="page-match">
-  <h2 class="page-title">Match Game</h2>
-  <div id="match-wrapper"></div>
-</div>
-
-<div class="page" id="page-speed">
-  <h2 class="page-title">Speed Round <span id="speed-mode-label"></span></h2>
-  <div id="speed-wrapper"></div>
-</div>
-
-<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()">✕ Close</button>
-    <img id="modal-img" class="modal-img" src="" alt="">
-    <div id="modal-era" class="modal-era"></div>
-    <div id="modal-title" class="modal-title"></div>
-    <div id="modal-meta" class="modal-meta"></div>
-    <div id="modal-sig" class="modal-sig"></div>
-  </div>
-</div>
+<footer>
+  <span>&copy; 2026 Bryce</span> 
+</footer>
 
 <script src="DATA.js"></script>
 <script>
@@ -1015,7 +1047,7 @@ const DATE_MAP={
   'The Creation of Adam':'1508–12','School of Athens':'1509–11',
   'Bacchus and Ariadne':'1520–23','Portrait of Henry VIII':'1537',
   'Anne of Cleves':'1539','Judith Slaying Holofernes':'1599',
-  'The Ecstacy of St. Teresa':'1647–52','The Anatomy Lesson of Dr. Tulp':'1632',
+  'The Ecstasy of St. Teresa':'1647–52','The Anatomy Lesson of Dr. Tulp':'1632',
   'The Night Watch':'1642','Woman with a Water Jug':'1660–62',
   'Girl with a Pearl Earring':'1665','The Death of Socrates':'1787',
   'Death of Marat':'1793','Napoleon Crossing the Alps':'1805',
