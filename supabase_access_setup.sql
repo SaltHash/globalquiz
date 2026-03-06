@@ -2,10 +2,11 @@
 -- Run this in the Supabase SQL editor as a privileged role.
 
 create extension if not exists pgcrypto;
+create extension if not exists vault;
 
 create table if not exists public.access_requests (
   id uuid primary key default gen_random_uuid(),
-  email text not null unique,
+  access_key text not null unique,
   status text not null default 'pending' check (status in ('pending','approved','denied')),
   requested_at timestamptz not null default timezone('utc', now()),
   approved_at timestamptz,
@@ -13,8 +14,8 @@ create table if not exists public.access_requests (
   review_note text,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now()),
-  constraint access_requests_email_format_chk check (
-    email ~* '^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}$'
+  constraint access_requests_key_length_chk check (
+    length(access_key) between 6 and 254
   ),
   constraint access_requests_approved_at_chk check (
     (status = 'approved' and approved_at is not null)
@@ -57,23 +58,23 @@ using (true)
 with check (true);
 
 -- SECURITY DEFINER RPC for request submission from anon clients.
-create or replace function public.request_access(p_email text)
+create or replace function public.request_access(p_access_key text)
 returns void
 language plpgsql
 security definer
 set search_path = public
 as $$
 declare
-  normalized_email text;
+  normalized_access_key text;
 begin
-  normalized_email := lower(trim(p_email));
-  if normalized_email is null or normalized_email = '' then
-    raise exception 'email_required';
+  normalized_access_key := trim(p_access_key);
+  if normalized_access_key is null or normalized_access_key = '' then
+    raise exception 'access_key_required';
   end if;
 
-  insert into public.access_requests (email)
-  values (normalized_email)
-  on conflict (email)
+  insert into public.access_requests (access_key)
+  values (normalized_access_key)
+  on conflict (access_key)
   do update set
     -- Allow re-request only if still pending; otherwise keep reviewer decision immutable.
     requested_at = case when public.access_requests.status = 'pending' then timezone('utc', now()) else public.access_requests.requested_at end,
@@ -82,24 +83,24 @@ end;
 $$;
 
 -- SECURITY DEFINER RPC for status polling from anon clients.
-create or replace function public.check_access(p_email text)
+create or replace function public.check_access(p_access_key text)
 returns jsonb
 language plpgsql
 security definer
 set search_path = public
 as $$
 declare
-  normalized_email text;
+  normalized_access_key text;
   rec public.access_requests%rowtype;
 begin
-  normalized_email := lower(trim(p_email));
-  if normalized_email is null or normalized_email = '' then
+  normalized_access_key := trim(p_access_key);
+  if normalized_access_key is null or normalized_access_key = '' then
     return jsonb_build_object('status', 'missing');
   end if;
 
   select * into rec
   from public.access_requests
-  where email = normalized_email
+  where access_key = normalized_access_key
   limit 1;
 
   if rec.id is null then
@@ -118,13 +119,13 @@ revoke all on function public.check_access(text) from public;
 grant execute on function public.request_access(text) to anon;
 grant execute on function public.check_access(text) to anon;
 
-create index if not exists idx_access_requests_email on public.access_requests (email);
+create index if not exists idx_access_requests_access_key on public.access_requests (access_key);
 create index if not exists idx_access_requests_status on public.access_requests (status);
 
 
 -- Admin-authenticated RPCs using a shared key passed in header x-admin-key.
--- Set this in your Supabase project settings (or SQL):
---   alter role authenticator set app.settings.admin_key = 'your-secret';
+-- Store your key in Supabase Vault, for example:
+--   select vault.create_secret('super-secret-admin-key', 'admin_access_key');
 
 create or replace function public.admin_list_access_requests()
 returns setof public.access_requests
@@ -137,7 +138,15 @@ declare
   expected_key text;
 begin
   req_key := coalesce(current_setting('request.headers', true)::json->>'x-admin-key', '');
-  expected_key := coalesce(current_setting('app.settings.admin_key', true), '');
+  select coalesce(
+    (select decrypted_secret
+     from vault.decrypted_secrets
+     where name = 'admin_access_key'
+     order by created_at desc
+     limit 1),
+    ''
+  ) into expected_key;
+
   if expected_key = '' or req_key = '' or req_key <> expected_key then
     raise exception 'invalid_admin_key';
   end if;
@@ -163,7 +172,15 @@ declare
   normalized_status text;
 begin
   req_key := coalesce(current_setting('request.headers', true)::json->>'x-admin-key', '');
-  expected_key := coalesce(current_setting('app.settings.admin_key', true), '');
+  select coalesce(
+    (select decrypted_secret
+     from vault.decrypted_secrets
+     where name = 'admin_access_key'
+     order by created_at desc
+     limit 1),
+    ''
+  ) into expected_key;
+
   if expected_key = '' or req_key = '' or req_key <> expected_key then
     raise exception 'invalid_admin_key';
   end if;
