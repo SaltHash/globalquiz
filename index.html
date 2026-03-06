@@ -300,6 +300,51 @@
   .modal-era { display: inline-block; font-size: 11px; background: var(--purple-dim); color: var(--purple); padding: 4px 12px; border-radius: 99px; margin-bottom: 12px; }
   .modal-sig { font-size: 13px; color: var(--text); line-height: 1.7; background: var(--bg3); border-radius: 10px; padding: 14px 16px; }
   .modal-close { position: absolute; top: 16px; right: 16px; background: var(--bg3); border: 1px solid var(--border); color: var(--text-dim); border-radius: 8px; padding: 6px 12px; font-family: 'Monda', sans-serif; font-size: 12px; cursor: pointer; }
+
+  /* ACCESS GATE */
+  .access-gate {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .access-card {
+    width: 100%;
+    max-width: 460px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .access-card h1 { font-size: 20px; margin-bottom: 10px; }
+  .access-card p { font-size: 12px; color: var(--text-dim); line-height: 1.6; margin-bottom: 14px; }
+  .access-field { margin-bottom: 12px; }
+  .access-field label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.7px; }
+  .access-field input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Monda', sans-serif;
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+  .access-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .access-status {
+    margin-top: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-dim);
+    background: var(--bg3);
+  }
+  .access-status.ok { border-color: rgba(74,222,128,0.4); color: var(--green); background: rgba(74,222,128,0.1); }
+  .access-status.warn { border-color: rgba(251,191,36,0.35); color: var(--yellow); background: rgba(251,191,36,0.12); }
+  .access-status.err { border-color: rgba(248,113,113,0.35); color: var(--red); background: rgba(248,113,113,0.1); }
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -307,6 +352,23 @@
 </head>
 <body>
 
+<div id="access-gate" class="access-gate">
+  <div class="access-card">
+    <h1>Request access</h1>
+    <p>This study site is private. Submit your email to request approval. You can only continue after an admin approves your request.</p>
+    <div class="access-field">
+      <label for="access-email">Email</label>
+      <input id="access-email" type="email" autocomplete="email" placeholder="you@example.com" maxlength="254">
+    </div>
+    <div class="access-actions">
+      <button class="btn" id="access-request-btn" onclick="requestAccess()">Request access</button>
+      <button class="btn outline" id="access-check-btn" onclick="checkAccess()">Check status</button>
+    </div>
+    <div id="access-status" class="access-status">Awaiting request.</div>
+  </div>
+</div>
+
+<div id="app-shell" style="display:none">
 <nav>
   <div class="logo">🎨 AP Art</div>
   <button class="active" onclick="showPage('home')">Home</button>
@@ -416,7 +478,173 @@
   </div>
 </div>
 
+
+</div>
+
 <script src="DATA.js"></script>
+<script>
+const ACCESS_CONFIG = {
+  supabaseUrl: window.SUPABASE_URL || '',
+  anonKey: window.SUPABASE_ANON_KEY || '',
+  requestRpc: 'request_access',
+  checkRpc: 'check_access',
+  pollMs: 10000,
+  sessionKey: 'apeuro_access_email',
+};
+
+const accessState = {
+  email: '',
+  approved: false,
+  polling: null,
+};
+
+function normalizeEmail(v) {
+  return (v || '').trim().toLowerCase();
+}
+
+function isValidEmail(v) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) && v.length <= 254;
+}
+
+function hasAccessConfig() {
+  return Boolean(ACCESS_CONFIG.supabaseUrl && ACCESS_CONFIG.anonKey);
+}
+
+function setAccessStatus(message, level='') {
+  const el = document.getElementById('access-status');
+  if(!el) return;
+  el.className = 'access-status' + (level ? ' ' + level : '');
+  el.textContent = message;
+}
+
+function lockButtons(locked) {
+  ['access-request-btn','access-check-btn'].forEach(id => {
+    const b = document.getElementById(id);
+    if(b) b.disabled = locked;
+  });
+}
+
+async function supabaseRequest(path, options = {}) {
+  const url = ACCESS_CONFIG.supabaseUrl.replace(/\/$/, '') + '/rest/v1/' + path;
+  const headers = {
+    apikey: ACCESS_CONFIG.anonKey,
+    Authorization: 'Bearer ' + ACCESS_CONFIG.anonKey,
+    'Content-Type': 'application/json',
+    ...options.headers,
+  };
+  const res = await fetch(url, {
+    method: options.method || 'GET',
+    headers,
+    body: options.body,
+  });
+  if(!res.ok) {
+    const detail = await res.text();
+    throw new Error('Supabase error ' + res.status + ': ' + detail);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+async function requestAccess() {
+  if(!hasAccessConfig()) {
+    setAccessStatus('Missing SUPABASE_URL or SUPABASE_ANON_KEY. Configure these globals before deploying.', 'err');
+    return;
+  }
+  const emailInput = document.getElementById('access-email');
+  const email = normalizeEmail(emailInput?.value);
+  if(!isValidEmail(email)) {
+    setAccessStatus('Enter a valid email address.', 'warn');
+    return;
+  }
+  lockButtons(true);
+  try {
+    await supabaseRequest('rpc/' + ACCESS_CONFIG.requestRpc, {
+      method: 'POST',
+      body: JSON.stringify({ p_email: email }),
+    });
+    accessState.email = email;
+    localStorage.setItem(ACCESS_CONFIG.sessionKey, email);
+    setAccessStatus('Request submitted. Ask the admin to set your status to approved, then click “Check status”.', 'ok');
+    await checkAccess(true);
+  } catch (e) {
+    setAccessStatus('Could not submit request. ' + e.message, 'err');
+  } finally {
+    lockButtons(false);
+  }
+}
+
+function unlockApp() {
+  accessState.approved = true;
+  if(accessState.polling) clearInterval(accessState.polling);
+  const gate = document.getElementById('access-gate');
+  const app = document.getElementById('app-shell');
+  if(gate) gate.style.display = 'none';
+  if(app) app.style.display = '';
+  renderHomeStats();
+}
+
+async function checkAccess(silent = false) {
+  if(!hasAccessConfig()) {
+    if(!silent) setAccessStatus('Missing SUPABASE_URL or SUPABASE_ANON_KEY.', 'err');
+    return;
+  }
+  const emailInput = document.getElementById('access-email');
+  const email = normalizeEmail(emailInput?.value || accessState.email || localStorage.getItem(ACCESS_CONFIG.sessionKey));
+  if(!isValidEmail(email)) {
+    if(!silent) setAccessStatus('Enter the same email used for your request.', 'warn');
+    return;
+  }
+  accessState.email = email;
+  if(emailInput) emailInput.value = email;
+  lockButtons(true);
+  try {
+    const row = await supabaseRequest('rpc/' + ACCESS_CONFIG.checkRpc, {
+      method: 'POST',
+      body: JSON.stringify({ p_email: email }),
+    });
+    if(!row || row.status === 'missing') {
+      setAccessStatus('No request found for this email yet. Click “Request access” first.', 'warn');
+      return;
+    }
+    if(row.status === 'approved') {
+      setAccessStatus('Access granted. Welcome!', 'ok');
+      unlockApp();
+      return;
+    }
+    if(row.status === 'denied') {
+      setAccessStatus('Access was denied. Contact the admin if this is unexpected.', 'err');
+      return;
+    }
+    setAccessStatus('Request is pending admin approval.', 'warn');
+  } catch (e) {
+    setAccessStatus('Could not verify status. ' + e.message, 'err');
+  } finally {
+    lockButtons(false);
+  }
+}
+
+function initAccessGate() {
+  const app = document.getElementById('app-shell');
+  if(app) app.style.display = 'none';
+  if(!hasAccessConfig()) {
+    setAccessStatus('Set window.SUPABASE_URL and window.SUPABASE_ANON_KEY before use.', 'err');
+    return;
+  }
+  const remembered = normalizeEmail(localStorage.getItem(ACCESS_CONFIG.sessionKey));
+  if(remembered) {
+    const input = document.getElementById('access-email');
+    if(input) input.value = remembered;
+    accessState.email = remembered;
+    checkAccess(true);
+  }
+  if(accessState.polling) clearInterval(accessState.polling);
+  accessState.polling = setInterval(() => {
+    if(accessState.approved || !accessState.email) return;
+    checkAccess(true);
+  }, ACCESS_CONFIG.pollMs);
+}
+</script>
+
 <script>
 // ─── LOCAL STORAGE ───────────────────────────────────
 const LS = {
@@ -1428,8 +1656,7 @@ function finishMatch(){
 }
 
 // ─── INIT ────────────────────────────────────────────
-renderHomeStats();
+initAccessGate();
 </script>
 </body>
 </html>
-
