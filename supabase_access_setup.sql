@@ -2,6 +2,7 @@
 -- Run this in the Supabase SQL editor as a privileged role.
 
 create extension if not exists pgcrypto;
+create extension if not exists vault;
 
 create table if not exists public.access_requests (
   id uuid primary key default gen_random_uuid(),
@@ -123,8 +124,8 @@ create index if not exists idx_access_requests_status on public.access_requests 
 
 
 -- Admin-authenticated RPCs using a shared key passed in header x-admin-key.
--- Configure this from your Supabase secret named admin_key so PostgREST exposes:
---   app.settings.admin_key
+-- Store your key in Supabase Vault, for example:
+--   select vault.create_secret('super-secret-admin-key', 'admin_access_key');
 
 create or replace function public.admin_list_access_requests()
 returns setof public.access_requests
@@ -137,7 +138,14 @@ declare
   expected_key text;
 begin
   req_key := coalesce(current_setting('request.headers', true)::json->>'x-admin-key', '');
-  expected_key := coalesce(current_setting('app.settings.admin_key', true), '');
+  select coalesce(
+    (select decrypted_secret
+     from vault.decrypted_secrets
+     where name = 'admin_access_key'
+     order by created_at desc
+     limit 1),
+    ''
+  ) into expected_key;
 
   if expected_key = '' or req_key = '' or req_key <> expected_key then
     raise exception 'invalid_admin_key';
@@ -164,7 +172,14 @@ declare
   normalized_status text;
 begin
   req_key := coalesce(current_setting('request.headers', true)::json->>'x-admin-key', '');
-  expected_key := coalesce(current_setting('app.settings.admin_key', true), '');
+  select coalesce(
+    (select decrypted_secret
+     from vault.decrypted_secrets
+     where name = 'admin_access_key'
+     order by created_at desc
+     limit 1),
+    ''
+  ) into expected_key;
 
   if expected_key = '' or req_key = '' or req_key <> expected_key then
     raise exception 'invalid_admin_key';
