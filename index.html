@@ -356,6 +356,27 @@
     font-size: 13px;
     padding: 10px 12px;
   }
+  .access-input-wrap { position: relative; }
+  .access-input-wrap input { padding-right: 42px; }
+  .access-toggle-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg2);
+    color: var(--text-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.15s;
+  }
+  .access-toggle-btn:hover { color: var(--purple); border-color: var(--purple); }
   .access-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
   .access-status {
     margin-top: 12px;
@@ -379,11 +400,14 @@
 
 <div id="access-gate" class="access-gate">
   <div class="access-card">
-    <h1>Request access</h1>
-    <p>This study site is private. Submit your email to request approval. You can only continue after an admin approves your request.</p>
+    <h1>Enter access key</h1>
+    <p>This study site is private. Enter your access key to request approval and unlock the app after admin review.</p>
     <div class="access-field">
-      <label for="access-email">Email</label>
-      <input id="access-email" type="email" autocomplete="email" placeholder="you@example.com" maxlength="254">
+      <label for="access-key">Access key</label>
+      <div class="access-input-wrap">
+        <input id="access-key" type="password" autocomplete="off" placeholder="Enter your access key" maxlength="254">
+        <button type="button" id="access-key-toggle" class="access-toggle-btn" onclick="toggleAccessKeyVisibility()" aria-label="Show access key" aria-pressed="false">👁</button>
+      </div>
     </div>
     <div class="access-actions">
       <button class="btn" id="access-request-btn" onclick="requestAccess()">Request access</button>
@@ -526,27 +550,39 @@ const ACCESS_CONFIG = {
   requestRpc: 'request_access',
   checkRpc: 'check_access',
   pollMs: 10000,
-  sessionKey: 'apeuro_access_email',
+  sessionKey: 'apeuro_access_key',
 };
 
 const ADMIN_CONFIG = {
   storageKey: 'ADMIN_KEY',
+  vaultSecretName: 'admin_key',
   listPath: 'rpc/admin_list_access_requests',
   reviewPath: 'rpc/admin_review_access_request',
 };
 
 const accessState = {
-  email: '',
+  accessKey: '',
   approved: false,
   polling: null,
 };
 
-function normalizeEmail(v) {
-  return (v || '').trim().toLowerCase();
+function normalizeAccessKey(v) {
+  return (v || '').trim();
 }
 
-function isValidEmail(v) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) && v.length <= 254;
+function isValidAccessKey(v) {
+  return v.length >= 6 && v.length <= 254;
+}
+
+function toggleAccessKeyVisibility() {
+  const input = document.getElementById('access-key');
+  const btn = document.getElementById('access-key-toggle');
+  if(!input || !btn) return;
+  const shouldShow = input.type === 'password';
+  input.type = shouldShow ? 'text' : 'password';
+  btn.textContent = shouldShow ? '🙈' : '👁';
+  btn.setAttribute('aria-label', shouldShow ? 'Hide access key' : 'Show access key');
+  btn.setAttribute('aria-pressed', String(shouldShow));
 }
 
 function hasAccessConfig() {
@@ -593,20 +629,20 @@ async function requestAccess() {
     setAccessStatus('Missing SUPABASE_URL or SUPABASE_ANON_KEY. Configure these globals before deploying.', 'err');
     return;
   }
-  const emailInput = document.getElementById('access-email');
-  const email = normalizeEmail(emailInput?.value);
-  if(!isValidEmail(email)) {
-    setAccessStatus('Enter a valid email address.', 'warn');
+  const accessKeyInput = document.getElementById('access-key');
+  const accessKey = normalizeAccessKey(accessKeyInput?.value);
+  if(!isValidAccessKey(accessKey)) {
+    setAccessStatus('Enter a valid access key (6+ characters).', 'warn');
     return;
   }
   lockButtons(true);
   try {
     await supabaseRequest('rpc/' + ACCESS_CONFIG.requestRpc, {
       method: 'POST',
-      body: JSON.stringify({ p_email: email }),
+      body: JSON.stringify({ p_access_key: accessKey }),
     });
-    accessState.email = email;
-    localStorage.setItem(ACCESS_CONFIG.sessionKey, email);
+    accessState.accessKey = accessKey;
+    localStorage.setItem(ACCESS_CONFIG.sessionKey, accessKey);
     setAccessStatus('Request submitted. Ask the admin to set your status to approved, then click “Check status”.', 'ok');
     await checkAccess(true);
   } catch (e) {
@@ -631,22 +667,22 @@ async function checkAccess(silent = false) {
     if(!silent) setAccessStatus('Missing SUPABASE_URL or SUPABASE_ANON_KEY.', 'err');
     return;
   }
-  const emailInput = document.getElementById('access-email');
-  const email = normalizeEmail(emailInput?.value || accessState.email || localStorage.getItem(ACCESS_CONFIG.sessionKey));
-  if(!isValidEmail(email)) {
-    if(!silent) setAccessStatus('Enter the same email used for your request.', 'warn');
+  const accessKeyInput = document.getElementById('access-key');
+  const accessKey = normalizeAccessKey(accessKeyInput?.value || accessState.accessKey || localStorage.getItem(ACCESS_CONFIG.sessionKey));
+  if(!isValidAccessKey(accessKey)) {
+    if(!silent) setAccessStatus('Enter the same access key used for your request.', 'warn');
     return;
   }
-  accessState.email = email;
-  if(emailInput) emailInput.value = email;
+  accessState.accessKey = accessKey;
+  if(accessKeyInput) accessKeyInput.value = accessKey;
   lockButtons(true);
   try {
     const row = await supabaseRequest('rpc/' + ACCESS_CONFIG.checkRpc, {
       method: 'POST',
-      body: JSON.stringify({ p_email: email }),
+      body: JSON.stringify({ p_access_key: accessKey }),
     });
     if(!row || row.status === 'missing') {
-      setAccessStatus('No request found for this email yet. Click “Request access” first.', 'warn');
+      setAccessStatus('No request found for this access key yet. Click “Request access” first.', 'warn');
       return;
     }
     if(row.status === 'approved') {
@@ -673,22 +709,27 @@ function initAccessGate() {
     setAccessStatus('Set window.SUPABASE_URL and window.SUPABASE_ANON_KEY before use.', 'err');
     return;
   }
-  const remembered = normalizeEmail(localStorage.getItem(ACCESS_CONFIG.sessionKey));
+  const remembered = normalizeAccessKey(localStorage.getItem(ACCESS_CONFIG.sessionKey));
   if(remembered) {
-    const input = document.getElementById('access-email');
+    const input = document.getElementById('access-key');
     if(input) input.value = remembered;
-    accessState.email = remembered;
+    accessState.accessKey = remembered;
     checkAccess(true);
   }
   if(accessState.polling) clearInterval(accessState.polling);
   accessState.polling = setInterval(() => {
-    if(accessState.approved || !accessState.email) return;
+    if(accessState.approved || !accessState.accessKey) return;
     checkAccess(true);
   }, ACCESS_CONFIG.pollMs);
 }
 
 function getAdminKey() {
-  return (localStorage.getItem(ADMIN_CONFIG.storageKey) || '').trim();
+  return (
+    window.ADMIN_KEY
+    || window[ADMIN_CONFIG.vaultSecretName]
+    || localStorage.getItem(ADMIN_CONFIG.storageKey)
+    || ''
+  ).trim();
 }
 
 function hasAdminKey() {
@@ -709,7 +750,7 @@ function setAdminTabVisibility() {
 
 async function supabaseAdminRequest(path, options = {}) {
   const adminKey = getAdminKey();
-  if(!adminKey) throw new Error('Missing ADMIN_KEY in localStorage.');
+  if(!adminKey) throw new Error('Missing admin key. Set window.admin_key (vault-injected) or localStorage.ADMIN_KEY.');
   const headers = {
     ...(options.headers || {}),
     'x-admin-key': adminKey,
@@ -730,7 +771,7 @@ function renderAccessRequests(rows) {
     const requestedAt = row.requested_at ? new Date(row.requested_at).toLocaleString() : 'Unknown date';
     return `<div class="request-card">
       <div>
-        <div class="request-email">${row.email}</div>
+        <div class="request-email">${row.access_key}</div>
         <div class="request-meta">Requested: ${requestedAt}</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
@@ -746,7 +787,7 @@ function renderAccessRequests(rows) {
 
 async function loadAccessRequests() {
   if(!hasAdminKey()) {
-    setRequestsStatus('Set localStorage.ADMIN_KEY to view requests.', 'warn');
+    setRequestsStatus('Set window.admin_key (vault-injected) or localStorage.ADMIN_KEY to view requests.', 'warn');
     return;
   }
   setRequestsStatus('Loading access requests...');
