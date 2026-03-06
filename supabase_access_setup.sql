@@ -120,3 +120,73 @@ grant execute on function public.check_access(text) to anon;
 
 create index if not exists idx_access_requests_email on public.access_requests (email);
 create index if not exists idx_access_requests_status on public.access_requests (status);
+
+
+-- Admin-authenticated RPCs using a shared key passed in header x-admin-key.
+-- Set this in your Supabase project settings (or SQL):
+--   alter role authenticator set app.settings.admin_key = 'your-secret';
+
+create or replace function public.admin_list_access_requests()
+returns setof public.access_requests
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  req_key text;
+  expected_key text;
+begin
+  req_key := coalesce(current_setting('request.headers', true)::json->>'x-admin-key', '');
+  expected_key := coalesce(current_setting('app.settings.admin_key', true), '');
+  if expected_key = '' or req_key = '' or req_key <> expected_key then
+    raise exception 'invalid_admin_key';
+  end if;
+
+  return query
+  select *
+  from public.access_requests
+  order by
+    case when status = 'pending' then 0 else 1 end,
+    requested_at desc;
+end;
+$$;
+
+create or replace function public.admin_review_access_request(p_id uuid, p_status text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  req_key text;
+  expected_key text;
+  normalized_status text;
+begin
+  req_key := coalesce(current_setting('request.headers', true)::json->>'x-admin-key', '');
+  expected_key := coalesce(current_setting('app.settings.admin_key', true), '');
+  if expected_key = '' or req_key = '' or req_key <> expected_key then
+    raise exception 'invalid_admin_key';
+  end if;
+
+  normalized_status := lower(trim(p_status));
+  if normalized_status not in ('approved', 'denied') then
+    raise exception 'invalid_status';
+  end if;
+
+  update public.access_requests
+  set
+    status = normalized_status,
+    approved_at = case when normalized_status = 'approved' then timezone('utc', now()) else null end,
+    updated_at = timezone('utc', now())
+  where id = p_id;
+
+  if not found then
+    raise exception 'request_not_found';
+  end if;
+end;
+$$;
+
+revoke all on function public.admin_list_access_requests() from public;
+revoke all on function public.admin_review_access_request(uuid, text) from public;
+grant execute on function public.admin_list_access_requests() to anon;
+grant execute on function public.admin_review_access_request(uuid, text) to anon;
