@@ -1030,7 +1030,7 @@ const DATE_MAP={
   'The Creation of Adam':'1508–12','School of Athens':'1509–11',
   'Bacchus and Ariadne':'1520–23','Portrait of Henry VIII':'1537',
   'Anne of Cleves':'1539','Judith Slaying Holofernes':'1599',
-  'The Ecstacy of St. Teresa':'1647–52','The Anatomy Lesson of Dr. Tulp':'1632',
+  'The Ecstasy of St. Teresa':'1647–52','The Anatomy Lesson of Dr. Tulp':'1632',
   'The Night Watch':'1642','Woman with a Water Jug':'1660–62',
   'Girl with a Pearl Earring':'1665','The Death of Socrates':'1787',
   'Death of Marat':'1793','Napoleon Crossing the Alps':'1805',
@@ -1052,21 +1052,36 @@ function getDateStr(c){ return DATE_MAP[c.name]||''; }
 
 function initTimeline(){
   const w=document.getElementById('timeline-wrapper');
-  // Group cards by their AP era (from card.era), preserve ERA_ORDER ordering
   const groups={};
+
   CARDS.forEach(c=>{
     const era=getStyle(c);
     if(!groups[era])groups[era]=[];
     groups[era].push(c);
   });
-  // Sort cards within each era by date
-  Object.values(groups).forEach(arr=>arr.sort((a,b)=>{
+
+  // Sort cards within each era chronologically.
+  Object.values(groups).forEach(cards=>cards.sort((a,b)=>{
     const da=parseInt(DATE_MAP[a.name])||0;
     const db=parseInt(DATE_MAP[b.name])||0;
     return da-db;
   }));
-  // Output in ERA_ORDER order, then any leftover eras appended
-  const orderedEras=[...ERA_ORDER.filter(e=>groups[e]),...Object.keys(groups).filter(e=>!ERA_ORDER.includes(e))];
+
+  // Sort eras by each era's earliest artwork date.
+  const orderedEras=Object.keys(groups).sort((eraA,eraB)=>{
+    const firstA=parseInt(DATE_MAP[groups[eraA][0]?.name])||Number.POSITIVE_INFINITY;
+    const firstB=parseInt(DATE_MAP[groups[eraB][0]?.name])||Number.POSITIVE_INFINITY;
+    if(firstA!==firstB)return firstA-firstB;
+
+    const idxA=ERA_ORDER.indexOf(eraA);
+    const idxB=ERA_ORDER.indexOf(eraB);
+    const normA=idxA===-1?Number.POSITIVE_INFINITY:idxA;
+    const normB=idxB===-1?Number.POSITIVE_INFINITY:idxB;
+    if(normA!==normB)return normA-normB;
+
+    return eraA.localeCompare(eraB);
+  });
+
   let html='';
   orderedEras.forEach(era=>{
     html+=`<div class="tl-era"><div class="tl-era-title">${era}</div><div class="tl-grid">`;
@@ -1081,6 +1096,7 @@ function initTimeline(){
     });
     html+='</div></div>';
   });
+
   w.innerHTML=html;
 }
 
