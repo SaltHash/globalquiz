@@ -12,15 +12,26 @@
       --bg2: rgb(22, 23, 27);
       --bg3: rgb(30, 32, 37);
       --border: rgb(45, 47, 55);
-      --accent: #f97316;
-      --accent-dim: rgba(249, 115, 22, 0.15);
+      --accent: #ff9169;
+      --accent-dim: rgba(255, 145, 105, 0.15);
       --text: #e8e9f0;
-      --text-dim: #9aa0b2;
+      --text-dim: #7a7d8e;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Monda', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-    nav { height: 56px; display: flex; align-items: center; padding: 0 24px; background: var(--bg2); border-bottom: 1px solid var(--border); }
-    .logo { color: var(--accent); font-weight: 700; font-size: 15px; }
+    nav {
+      background: var(--bg2); border-bottom: 1px solid var(--border);
+      padding: 0 24px; display: flex; align-items: center; gap: 4px;
+      height: 56px; position: sticky; top: 0; z-index: 100;
+    }
+    .logo { color: var(--accent); font-weight: 700; font-size: 15px; margin-right: 20px; letter-spacing: 0.5px; }
+    nav .nav-link {
+      text-decoration: none; color: var(--text-dim);
+      font-family: 'Monda', sans-serif; font-size: 13px; padding: 8px 14px;
+      border-radius: 8px; transition: all 0.15s;
+    }
+    nav .nav-link:hover { color: var(--text); background: var(--bg3); }
+    nav .nav-link.active { color: var(--accent); background: var(--accent-dim); }
     main { max-width: 900px; margin: 0 auto; padding: 42px 24px; }
     h1 { font-size: 30px; margin-bottom: 10px; }
     p { color: var(--text-dim); margin-bottom: 28px; }
@@ -33,7 +44,12 @@
   </style>
 </head>
 <body>
-  <nav><div class="logo">🌍 GlobalQuiz</div></nav>
+  <nav>
+    <div class="logo">🌍 GlobalQuiz</div>
+    <a class="nav-link active" href="index.html">Home</a>
+    <a class="nav-link" href="sets/artists-and-works/index.html">Artists and Works</a>
+    <a class="nav-link" href="sets/hub-dates/index.html">HUB Dates</a>
+  </nav>
   <main>
     <h1>Select a study set</h1>
     <p>Choose a set to practice with quizzes, speed rounds, flashcards, timeline browse, and matching mode.</p>
@@ -46,7 +62,7 @@
       <a class="set-card" href="sets/hub-dates/index.html">
         <h2>HUB Dates</h2>
         <span>European History Milestones</span>
-        <p>Practice important events, dates, eras, and historical significance.</p>
+        <p>Practice important events, dates, and historical significance.</p>
       </a>
     </div>
   </main>
