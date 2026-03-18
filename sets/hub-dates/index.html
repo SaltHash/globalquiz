@@ -22,6 +22,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Monda', sans-serif; min-height: 100vh; display: flex; flex-direction: column;}
+  #site-content { flex: 1; width: 100%; }
   nav {
     background: var(--bg2); border-bottom: 1px solid var(--border);
     padding: 0 24px; display: flex; align-items: center; gap: 4px;
@@ -169,7 +170,7 @@
     justify-content: center; border-bottom: 1px solid var(--border);
     min-height: 240px; max-height: 340px; overflow: hidden;
   }
-  .quiz-image-area img { max-width: 100%; max-height: 340px; object-fit: contain; display: block; }
+  .quiz-prompt { font-size: 18px; font-weight: 700; color: var(--purple); text-align: center; line-height: 1.5; }
   .quiz-body { padding: 22px; }
   .quiz-fields { display: flex; flex-direction: column; gap: 16px; }
   .quiz-field label { display: block; font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
@@ -256,7 +257,7 @@
   .tl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(138px, 1fr)); gap: 10px; }
   .tl-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 10px; cursor: pointer; transition: all 0.15s; }
   .tl-item:hover { border-color: var(--purple); transform: translateY(-2px); }
-  .tl-item img { width: 100%; height: 88px; object-fit: cover; border-radius: 6px; margin-bottom: 8px; }
+  .tl-item-prompt { font-size: 11px; color: var(--purple); margin-bottom: 6px; line-height: 1.4; font-weight: 700; }
   .tl-item-title { font-size: 11px; font-weight: 700; margin-bottom: 2px; }
   .tl-item-artist { font-size: 10px; color: var(--text-dim); }
   .tl-item-date { font-size: 10px; color: var(--purple); margin-bottom: 3px; }
@@ -275,7 +276,7 @@
   .match-tile.selected { border-color: var(--purple); background: var(--purple-dim); }
   .match-tile.matched { border-color: var(--green); background: rgba(74,222,128,0.1); opacity: 0.6; cursor: default; }
   .match-tile.wrong-flash { border-color: var(--red); background: rgba(248,113,113,0.15); }
-  .match-tile img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
+  .match-tile .tile-prompt { line-height: 1.35; color: var(--purple); font-weight: 700; }
   .match-tile .tile-label { line-height: 1.3; color: var(--text); }
   .match-done { text-align: center; padding: 48px 24px; background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; }
   .match-done h3 { font-size: 20px; margin-bottom: 8px; }
@@ -295,7 +296,7 @@
     transform: translateY(16px); transition: transform 0.2s; position: relative;
   }
   .modal-overlay.open .modal { transform: translateY(0); }
-  .modal-img { width: 100%; max-height: 280px; object-fit: contain; border-radius: 10px; margin-bottom: 18px; background: var(--bg3); }
+  .modal-prompt { font-size: 16px; font-weight: 700; color: var(--purple); margin-bottom: 14px; }
   .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
   .modal-meta { font-size: 13px; color: var(--text-dim); margin-bottom: 12px; }
   .modal-era { display: inline-block; font-size: 11px; background: var(--purple-dim); color: var(--purple); padding: 4px 12px; border-radius: 99px; margin-bottom: 12px; }
@@ -419,7 +420,7 @@
   <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
     <div class="modal">
       <button class="modal-close" onclick="closeModal()">✕ Close</button>
-      <img id="modal-img" class="modal-img" src="" alt="">
+      <div id="modal-prompt" class="modal-prompt"></div>
       <div id="modal-era" class="modal-era"></div>
       <div id="modal-title" class="modal-title"></div>
       <div id="modal-meta" class="modal-meta"></div>
@@ -478,12 +479,12 @@ function toggleSection(id) {
 // ─── CARDS ───────────────────────────────────────────
 function buildCards() {
   return quizData.map(q => ({
-    image: q.image,
-    name:   q.answers.find(a=>a.label==='Name:')?.correct||'',
-    artist: q.answers.find(a=>a.label==='Artist:')?.correct||'',
-    era:    q.answers.find(a=>a.label==='Era:')?.correct||'',
-    sig:    q.answers.find(a=>a.label==='Significance:')?.correct||'',
-    sigShort: q.answers.find(a=>a.label==='Significance (Short):')?.correct || 'Major turning point that reshaped Europe.',
+    prompt: q.prompt || '',
+    name:   q.answers.find(a=>a.label==='Event:')?.correct||'',
+    artist: q.answers.find(a=>a.label==='Year:')?.correct||'',
+    era:    q.era || '',
+    sig:    q.significanceLong || q.answers.find(a=>a.label==='Significance:')?.correct||'',
+    sigShort: q.significanceShort || q.answers.find(a=>a.label==='Significance:')?.correct || 'Major turning point that reshaped Europe.',
   }));
 }
 const CARDS = buildCards();
@@ -671,8 +672,8 @@ function fmtMs(ms) {
 // ─── QUIZ ────────────────────────────────────────────
 let quizState=null, quizCount=10, quizMode='normal';
 const QUIZ_PARTS = [
-  { key:'name', label:'Name:', desc:'Event' },
-  { key:'artist', label:'Artist:', desc:'Date' },
+  { key:'name', label:'Event:', desc:'Event' },
+  { key:'artist', label:'Year:', desc:'Date' },
   { key:'significance', label:'Significance:', desc:'Significance' },
 ];
 let selectedQuizParts = new Set(QUIZ_PARTS.map(p=>p.key));
@@ -747,7 +748,7 @@ function startQuiz() {
   let pool;
   if(quizMode==='wrong') {
     const wrongIds = LS.get('quiz_wrong_ids') || [];
-    pool = quizData.filter(q => wrongIds.includes(q.answers.find(a=>a.label==='Name:')?.correct));
+    pool = quizData.filter(q => wrongIds.includes(q.answers.find(a=>a.label==='Event:')?.correct));
     if(!pool.length) { alert('No wrong answers saved. Take a normal quiz first!'); return; }
     pool = pool.sort(()=>Math.random()-0.5);
   } else {
@@ -771,7 +772,7 @@ function renderQuiz() {
       <div class="quiz-counter">${index+1}/${questions.length}</div>
     </div>
     <div class="quiz-card">
-      <div class="quiz-image-area"><img src="${q.image}" alt="artwork"></div>
+      <div class="quiz-image-area"><div class="quiz-prompt">${q.prompt || `${q.answers.find(a=>a.label==='Year:')?.correct || ''} — ${q.answers.find(a=>a.label==='Event:')?.correct || ''}`}</div></div>
       <div class="quiz-body">
         <div class="quiz-fields" id="quiz-fields"></div>
         <div class="quiz-feedback" id="quiz-feedback"></div>
@@ -789,8 +790,7 @@ function renderQuiz() {
       div.innerHTML=`<label>${ans.label}</label><input type="text" id="qf-${ai}" placeholder="Type answer…" autocomplete="off">`;
     } else {
       const shuffledOpts=[...ans.options].sort(()=>Math.random()-0.5);
-      const isEra=ans.label==='Era:';
-      const cls=isEra?'mc-options-grid':'mc-options-col';
+      const cls='mc-options-col';
       div.innerHTML=`<label>${ans.label}</label><div class="${cls}" id="mc-${ai}">`+
         shuffledOpts.map(opt=>`<button class="mc-option" data-ai="${ai}" data-val="${encodeURIComponent(opt)}" onclick="selectMC(this)">${opt}</button>`).join('')+`</div>`;
     }
@@ -884,7 +884,7 @@ function submitQuiz(){
   if(allCorrect)quizState.correct++;
   else {
     // record this artwork name as wrong
-    const nameAns = q.answers.find(a=>a.label==='Name:');
+    const nameAns = q.answers.find(a=>a.label==='Event:');
     if(nameAns) quizState.wrongNames.push(nameAns.correct);
   }
   const fb=document.getElementById('quiz-feedback');
@@ -968,7 +968,7 @@ function renderFC(){
     <div class="fc-info" style="margin-bottom:12px">${remaining} cards remaining · click card to reveal</div>
     <div class="fc-card-container">
       <div class="fc-card" id="fc-card" onclick="flipCard()">
-        <div class="fc-front"><img src="${card.image}" alt=""><div class="fc-flip-hint">tap to flip</div></div>
+        <div class="fc-front"><div class="quiz-prompt">${card.prompt || `${card.artist} — ${card.name}`}</div><div class="fc-flip-hint">tap to flip</div></div>
         <div class="fc-back">
           <div class="fc-back-title">${card.name}</div>
           <div class="fc-back-artist">${card.artist}</div>
@@ -1017,56 +1017,19 @@ function shuffleFC(){
 }
 
 // ─── TIMELINE ────────────────────────────────────────
-// AP era order — same as THEOPTIONS in DATA.js
-const ERA_ORDER = [
-  "Renaissance","Reformation","Counter Reformation","Dutch Baroque Period",
-  "Absolutism","Constitutionalism","Scientific Revolution","Enlightenment",
-  "French Revolution","Napoleonic Era","Industrial Revolution",
-  "Liberal Revolutions and Unification","Post 1871 State Building (La Belle Epoch)",
-  "WWI","Interwar Years","WWII","Cold War","Contemporary Europe",
-];
-
-const DATE_MAP={
-  'Arnolfini Portrait':'1434','Birth of Venus':'1485–86','Vitruvian Man':'1490',
-  'The Last Supper':'1495–98','Pietà':'1499','David':'1501–04',
-  'The Creation of Adam':'1508–12','School of Athens':'1509–11',
-  'Bacchus and Ariadne':'1520–23','Portrait of Henry VIII':'1537',
-  'Anne of Cleves':'1539','Judith Slaying Holofernes':'1599',
-  'The Ecstasy of St. Teresa':'1647–52','The Anatomy Lesson of Dr. Tulp':'1632',
-  'The Night Watch':'1642','Woman with a Water Jug':'1660–62',
-  'Girl with a Pearl Earring':'1665','The Death of Socrates':'1787',
-  'Death of Marat':'1793','Napoleon Crossing the Alps':'1805',
-  'The Third of May':'1814','Liberty Leading the People':'1830',
-  'The Slave Ship':'1840','Ballet Rehearsal':'1873',
-  'Impression, Sunrise':'1872','The Luncheon of the Boating Party':'1881',
-  'A Bar at the Folies-Bergère':'1882','The Scream':'1893',
-  'A Sunday Afternoon on the Island of La Grande Jatte':'1886',
-  'Starry Night':'1889','Self Portrait':'1889','The Kiss':'1907–08',
-  'The Night':'1918–19',"Les Demoiselles d'Avignon":'1907',
-  'The Persistence of Memory':'1931','Guernica':'1937',
-  'Man Pointing':'1947','Ochre on Red':'1954',
-};
-
-// Normalize era string for matching (trim trailing spaces/commas)
-function normalizeEra(e){ return e.trim().replace(/,\s*$/,''); }
-function getStyle(c){ return normalizeEra(c.era||'Other'); }
-function getDateStr(c){ return DATE_MAP[c.name]||''; }
+function getDateStr(c){ return c.artist || ''; }
 
 function initTimeline(){
   const w=document.getElementById('timeline-wrapper');
-  const cards=[...CARDS].sort((a,b)=>{
-    const da=parseInt(DATE_MAP[a.name])||0;
-    const db=parseInt(DATE_MAP[b.name])||0;
-    return da-db;
-  });
+  const cards=[...CARDS].sort((a,b)=>parseInt(a.artist,10)-parseInt(b.artist,10));
 
   w.innerHTML=`<div class="tl-grid">${cards.map(c=>{
     const cardIndex = CARDS.indexOf(c);
     return `<div class="tl-item" onclick="openModalByIndex(${cardIndex})">
-      <img src="${c.image}" alt="${c.name}">
+      <div class="tl-item-prompt">${c.prompt || `${c.artist} — ${c.name}`}</div>
       <div class="tl-item-date">${getDateStr(c)}</div>
       <div class="tl-item-title">${c.name}</div>
-      <div class="tl-item-artist">${c.artist}</div>
+      <div class="tl-item-artist">${c.era}</div>
     </div>`;
   }).join('')}</div>`;
 }
@@ -1078,9 +1041,9 @@ function openModalByIndex(index){
 
 function openModal(card){
   if(!card)return;
-  document.getElementById('modal-img').src=card.image;
+  document.getElementById('modal-prompt').textContent=card.prompt || `${card.artist} — ${card.name}`;
   document.getElementById('modal-title').textContent=card.name;
-  document.getElementById('modal-meta').textContent=`${card.artist}  ·  ${getDateStr(card)}`;
+  document.getElementById('modal-meta').textContent=`${card.era} · ${card.artist}`;
   document.getElementById('modal-era').style.display='none';
   document.getElementById('modal-sig').textContent=card.sig;
   document.getElementById('modal-overlay').classList.add('open');
@@ -1133,8 +1096,7 @@ function renderSpeed() {
   // Only show MC fields for speed round
   const mcAnswers = q.answers.filter(a=>a.label==='Significance:');
   let fieldsHtml = mcAnswers.map((ans,ai)=>{
-    const isEra = ans.label==='Era:';
-    const cls = isEra ? 'mc-options-grid' : 'mc-options-col';
+    const cls = 'mc-options-col';
     const shuffledOpts = [...ans.options].sort(()=>Math.random()-0.5);
     return `<div class="quiz-field">
       <label>${ans.label}</label>
@@ -1155,7 +1117,7 @@ function renderSpeed() {
       </div>
     </div>
     <div class="quiz-card">
-      <div class="quiz-image-area"><img src="${q.image}" alt="artwork"></div>
+      <div class="quiz-image-area"><div class="quiz-prompt">${q.prompt || `${q.answers.find(a=>a.label==='Year:')?.correct || ''} — ${q.answers.find(a=>a.label==='Event:')?.correct || ''}`}</div></div>
       <div class="quiz-body">
         <div class="quiz-fields">${fieldsHtml}</div>
         <div class="quiz-actions" style="margin-top:14px">
@@ -1268,23 +1230,23 @@ function finishSpeed() {
 
 // ─── MATCH ───────────────────────────────────────────
 let matchState=null;
-let matchSetupMode='title';
+let matchSetupMode='name';
 
 function setMatchMode(mode){
   matchSetupMode=mode;
   initMatch();
 }
 
-function getMatchLabel(card,mode){
-  if(mode==='artist') return card.artist || 'Unknown Date';
-  if(mode==='significance') return card.sigShort || 'Major turning point that reshaped Europe.';
-  return card.name || 'Untitled';
+function getMatchPair(card,mode){
+  if(mode==='significance') return { left: card.sigShort || 'Major turning point that reshaped Europe.', right: `${card.name} (${card.artist})` };
+  if(mode==='name') return { left: card.name || 'Unknown Event', right: card.sigShort || 'Major turning point that reshaped Europe.' };
+  return { left: card.name || 'Unknown Event', right: card.artist || 'Unknown Date' };
 }
 
 function getMatchModeLabel(mode){
-  if(mode==='artist') return 'Date';
-  if(mode==='significance') return 'Impact';
-  return 'Event';
+  if(mode==='significance') return 'Significance Mode';
+  if(mode==='name') return 'Name Mode';
+  return 'Date Mode';
 }
 
 function initMatch(){
@@ -1292,9 +1254,9 @@ function initMatch(){
     <div style="text-align:center;padding:40px 0">
       <div style="font-size:40px;margin-bottom:16px">⚡</div>
       <h3 style="font-size:17px;margin-bottom:8px">Match Game</h3>
-      <p style="font-size:13px;color:var(--text-dim);margin-bottom:14px">Match event cards to the correct event, date, or impact. Race the clock!</p>
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:14px">Match significance → event and year, event → significance, or event → year. Race the clock!</p>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px">
-        ${['title','artist','significance'].map(mode=>`
+        ${['significance','name','date'].map(mode=>`
           <button class="btn ${matchSetupMode===mode?'':'outline'} sm" onclick="setMatchMode('${mode}')">${getMatchModeLabel(mode)}</button>
         `).join('')}
       </div>
@@ -1307,13 +1269,14 @@ function initMatch(){
   matchState=null;
 }
 
-function startMatch(n,difficulty,mode='title'){
+function startMatch(n,difficulty,mode='name'){
   const sel=[...CARDS].sort(()=>Math.random()-0.5).slice(0,n);
   const tiles=[];
   sel.forEach((c,i)=>{
-    const value=getMatchLabel(c,mode);
-    tiles.push({matchValue:value,type:'image',card:c});
-    tiles.push({matchValue:value,type:'label',label:value,card:c});
+    const pair=getMatchPair(c,mode);
+    const pairId=`${mode}-${i}-${c.name}`;
+    tiles.push({pairId,type:'left',label:pair.left,card:c});
+    tiles.push({pairId,type:'right',label:pair.right,card:c});
   });
   tiles.sort(()=>Math.random()-0.5);
   matchState={tiles,selected:[],matched:new Set(),startTime:Date.now(),timer:null,n,difficulty,mode};
@@ -1341,7 +1304,7 @@ function renderMatch(){
       ${tiles.map((t,i)=>{
         const isM=matched.has(i);
         return `<div class="match-tile${isM?' matched':''}" data-idx="${i}" onclick="clickMatchTile(${i})">
-          ${t.type==='image'?(t.card.image?`<img src="${t.card.image}" alt="">`:`<div class="tile-label">📘</div>`):`<div class="tile-label">${t.label}</div>`}
+          <div class="tile-label">${t.label}</div>
         </div>`;
       }).join('')}
     </div>
@@ -1357,7 +1320,7 @@ function clickMatchTile(idx){
   if(selected.length===2){
     clearInterval(matchState.timer);
     const[a,b]=selected,ta=tiles[a],tb=tiles[b];
-    if(ta.matchValue===tb.matchValue&&ta.type!==tb.type){
+    if(ta.pairId===tb.pairId&&ta.type!==tb.type){
       matched.add(a);
       matched.add(b);
       matchState.selected=[];
@@ -1382,7 +1345,7 @@ function finishMatch(){
       <div style="font-size:40px;margin-bottom:12px">🎉</div>
       <h3>All matched!</h3>
       <div class="time">${elapsed}s</div>
-      <p>${matchState.n} ${getMatchModeLabel(matchState.mode)} pairs · ${elapsed<30?'🔥 Blazing fast!':elapsed<60?'✓ Nice work!':'Keep practicing!'}</p>
+      <p>${matchState.n} pairs · ${getMatchModeLabel(matchState.mode)} · ${elapsed<30?'🔥 Blazing fast!':elapsed<60?'✓ Nice work!':'Keep practicing!'}</p>
       <div style="display:flex;gap:10px;justify-content:center">
         <button class="btn" onclick="startMatch(${matchState.n},'${matchState.difficulty}','${matchState.mode}')">Play Again</button>
         <button class="btn outline" onclick="initMatch()">Change Difficulty</button>
