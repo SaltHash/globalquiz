@@ -28,7 +28,8 @@
     padding: 0 24px; display: flex; align-items: center; gap: 4px;
     height: 56px; position: sticky; top: 0; z-index: 100;
   }
-  nav .logo { font-size: 15px; font-weight: 700; color: var(--purple); margin-right: 20px; letter-spacing: 0.5px; }
+  nav .logo { display:inline-flex; align-items:center; gap:8px; font-size: 15px; font-weight: 700; color: var(--purple); margin-right: 20px; letter-spacing: 0.5px; text-decoration:none; }
+  nav .logo-mark { font-size:16px; line-height:1; display:inline-flex; align-items:center; }
   nav button {
     background: none; border: none; color: var(--text-dim);
     font-family: 'Monda', sans-serif; font-size: 13px; padding: 8px 14px;
@@ -67,7 +68,9 @@
     padding: 24px 22px; cursor: pointer; transition: all 0.2s;
   }
   .home-card:hover { border-color: var(--purple); background: var(--bg3); transform: translateY(-2px); }
-  .home-card .icon { font-size: 26px; margin-bottom: 10px; }
+  .home-card .icon { width: 42px; height: 42px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg3); color: var(--purple); margin-bottom: 12px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
+  .home-card .icon svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .home-card .icon-text { font-size: 20px; }
   .home-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
   .home-card p { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
 
@@ -346,8 +349,7 @@
 <body>
 
 <nav>
-  <div class="logo">🌍 GlobalQuiz</div>
-  <a class="nav-link" href="../../index.html">Home</a>
+  <a class="logo" href="../../index.html"><span class="logo-mark">🌍</span><span>GlobalQuiz</span></a>
   <a class="nav-link" href="../artists-and-works/index.html">Artists and Works</a>
   <a class="nav-link active" href="../hub-dates/index.html">HUB Dates</a>
 </nav>
@@ -358,27 +360,27 @@
     <div id="streak-bar-wrap"></div>
     <div class="home-grid">
       <div class="home-card" onclick="showPage('quiz')">
-        <div class="icon">📝</div><h3>Practice Quiz</h3>
+        <div class="icon"><span class="icon-text">✎</span></div><h3>Practice Quiz</h3>
         <p>Identify the event, date, and significance. Choose how many questions.</p>
       </div>
       <div class="home-card" onclick="showPage('speed')">
-        <div class="icon">⚡</div><h3>Speed Round</h3>
+        <div class="icon"><span class="icon-text">⚡</span></div><h3>Speed Round</h3>
         <p>10 seconds per question. Train quick recall of events and impacts.</p>
       </div>
       <div class="home-card" onclick="showPage('flashcards')">
-        <div class="icon">🃏</div><h3>Flashcards</h3>
-        <p>Spaced repetition. Rate yourself — Know, Kinda, Don't Know. Hard cards come back sooner.</p>
+        <div class="icon"><span class="icon-text">▤</span></div><h3>Flashcards</h3>
+        <p>Spaced repetition. Rate yourself — Know ✓, Kinda ◐, Don't Know ✗. Hard cards come back sooner.</p>
       </div>
       <div class="home-card" onclick="showPage('timeline')">
-        <div class="icon">📅</div><h3>Timeline Browse</h3>
+        <div class="icon"><span class="icon-text">⌖</span></div><h3>Timeline Browse</h3>
         <p>Browse all events in chronological order. Click any for full details.</p>
       </div>
       <div class="home-card" onclick="showPage('match')">
-        <div class="icon">🧩</div><h3>Match Game</h3>
+        <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="8" rx="1.5"/><rect x="13" y="4" width="8" height="8" rx="1.5"/><rect x="3" y="14" width="8" height="8" rx="1.5"/><path d="M16.5 14h1a3.5 3.5 0 0 1 0 7h-1"/><path d="M16.5 17.5h-5.5"/></svg></div><h3>Match Game</h3>
         <p>Match events with dates and impact. Race the clock and beat your best time.</p>
       </div>
       <div class="home-card" onclick="showPage('siglab')">
-        <div class="icon">🧠</div><h3>Significance Lab</h3>
+        <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9.5 6.5a3.5 3.5 0 1 1 7 0v.8a3 3 0 0 1 2.5 3v.4a3 3 0 0 1-1.8 2.7 3 3 0 0 1 .8 2.1v.4a3 3 0 0 1-3 3H10a4 4 0 0 1-4-4v-4.7a3.3 3.3 0 0 1 3.5-3.3z"/><path d="M12 7v10"/><path d="M9.5 12h5"/></svg></div><h3>Significance Lab</h3>
         <p>Build causal chains from historical impact fragments. Train deeper significance reasoning.</p>
       </div>
     </div>
@@ -424,7 +426,7 @@
     <h2 class="page-title">Flashcards <span><button class="btn outline sm" onclick="shuffleFC()" style="font-size:11px">🔀 Shuffle</button></span></h2>
     <div class="fc-status-bar">
       <div class="fc-status-pill know"><div class="num" id="fc-know-count">0</div><div class="lbl">Know ✓</div></div>
-      <div class="fc-status-pill kinda"><div class="num" id="fc-kinda-count">0</div><div class="lbl">Kinda ~</div></div>
+      <div class="fc-status-pill kinda"><div class="num" id="fc-kinda-count">0</div><div class="lbl">Kinda ◐</div></div>
       <div class="fc-status-pill dontknow"><div class="num" id="fc-dk-count">0</div><div class="lbl">Don't Know ✗</div></div>
     </div>
     <div id="fc-wrapper"></div>
@@ -684,7 +686,7 @@ function renderFCProg() {
       <div class="fc-prog-count">${know}</div>
     </div>
     <div class="fc-prog-row">
-      <div class="fc-prog-label" style="color:var(--yellow)">Kinda ~</div>
+      <div class="fc-prog-label" style="color:var(--yellow)">Kinda ◐</div>
       <div class="fc-prog-bar-wrap"><div class="fc-prog-bar" style="width:${(kinda/total*100).toFixed(1)}%;background:var(--yellow)"></div></div>
       <div class="fc-prog-count">${kinda}</div>
     </div>
@@ -1012,7 +1014,7 @@ function renderFC(){
     </div>
     <div class="fc-rating-btns" id="fc-btns" style="display:none">
       <button class="dontknow-btn" onclick="rateCard('dontknow')">✗ Don't Know</button>
-      <button class="kinda-btn" onclick="rateCard('kinda')">~ Kinda</button>
+      <button class="kinda-btn" onclick="rateCard('kinda')">◐ Kinda</button>
       <button class="know-btn" onclick="rateCard('know')">✓ Know It</button>
     </div>
   `;
@@ -1060,7 +1062,7 @@ function initTimeline(){
   w.innerHTML=`<div class="tl-grid">${cards.map(c=>{
     const cardIndex = CARDS.indexOf(c);
     return `<div class="tl-item" onclick="openModalByIndex(${cardIndex})">
-      <div class="tl-item-prompt">${c.prompt || `${c.artist} — ${c.name}`}</div>
+      <div class="tl-item-prompt">${c.name}</div>
       <div class="tl-item-date">${getDateStr(c)}</div>
       <div class="tl-item-title">${c.name}</div>
       <div class="tl-item-artist">${c.era}</div>
