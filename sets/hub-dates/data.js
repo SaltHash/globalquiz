@@ -1,3 +1,15 @@
+function buildSignificanceChain(item) {
+  const parts = item.significanceLong
+    .split(/[.;]/)
+    .map(p => p.trim())
+    .filter(Boolean)
+    .flatMap(p => p.split(',').map(x => x.trim()).filter(Boolean));
+  const unique = [...new Set(parts)];
+  const chain = unique.slice(0, 3);
+  while(chain.length < 3) chain.push(item.significanceShort);
+  return chain.map(c => c[0]?.toUpperCase() + c.slice(1));
+}
+
 const quizData = [
   {
     year: "1350",
@@ -254,5 +266,6 @@ const quizData = [
     }
   ],
   significanceLong: item.significanceLong,
-  significanceShort: item.significanceShort
+  significanceShort: item.significanceShort,
+  significanceChain: item.significanceChain || buildSignificanceChain(item)
 }));
