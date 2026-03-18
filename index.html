@@ -24,7 +24,8 @@
       padding: 0 24px; display: flex; align-items: center; gap: 4px;
       height: 56px; position: sticky; top: 0; z-index: 100;
     }
-    .logo { color: var(--accent); font-weight: 700; font-size: 15px; margin-right: 20px; letter-spacing: 0.5px; }
+    .logo { display:inline-flex; align-items:center; gap:8px; color: var(--accent); font-weight: 700; font-size: 15px; margin-right: 20px; letter-spacing: 0.5px; text-decoration:none; }
+    .logo-mark { font-size:16px; line-height:1; display:inline-flex; align-items:center; }
     nav .nav-link {
       text-decoration: none; color: var(--text-dim);
       font-family: 'Monda', sans-serif; font-size: 13px; padding: 8px 14px;
@@ -46,8 +47,7 @@
 </head>
 <body>
   <nav>
-    <div class="logo">🌍 GlobalQuiz</div>
-    <a class="nav-link active" href="index.html">Home</a>
+    <a class="logo" href="index.html"><span class="logo-mark">🌍</span><span>GlobalQuiz</span></a>
     <a class="nav-link" href="sets/artists-and-works/index.html">Artists and Works</a>
     <a class="nav-link" href="sets/hub-dates/index.html">HUB Dates</a>
   </nav>
