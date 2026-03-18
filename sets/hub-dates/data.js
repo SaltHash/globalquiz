@@ -15,7 +15,7 @@ const THEOPTIONS = [
 function eventImage(year, event) {
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='500' height='300'>
     <rect width='100%' height='100%' fill='#1f2937'/>
-    <text x='50%' y='45%' fill='#f97316' font-size='46' text-anchor='middle' font-family='Arial'>${year}</text>
+    <text x='50%' y='45%' fill='#ff9169' font-size='46' text-anchor='middle' font-family='Arial'>${year}</text>
     <text x='50%' y='62%' fill='#e5e7eb' font-size='22' text-anchor='middle' font-family='Arial'>${event}</text>
   </svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;

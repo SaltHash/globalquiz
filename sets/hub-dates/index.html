@@ -12,8 +12,8 @@
     --bg2: rgb(22, 23, 27);
     --bg3: rgb(30, 32, 37);
     --border: rgb(45, 47, 55);
-    --purple: #f97316;
-    --purple-dim: rgba(249, 115, 22, 0.15);
+    --purple: #ff9169;
+    --purple-dim: rgba(255, 145, 105, 0.15);
     --text: #e8e9f0;
     --text-dim: #7a7d8e;
     --green: #4ade80;
@@ -334,7 +334,7 @@
     <div class="home-grid">
       <div class="home-card" onclick="showPage('quiz')">
         <div class="icon">📝</div><h3>Practice Quiz</h3>
-        <p>Identify the event, date, era, and significance. Choose how many questions.</p>
+        <p>Identify the event, date, and significance. Choose how many questions.</p>
       </div>
       <div class="home-card" onclick="showPage('speed')">
         <div class="icon">⚡</div><h3>Speed Round</h3>
@@ -346,11 +346,11 @@
       </div>
       <div class="home-card" onclick="showPage('timeline')">
         <div class="icon">📅</div><h3>Timeline Browse</h3>
-        <p>Browse all events grouped by AP era. Click any for full details.</p>
+        <p>Browse all events in chronological order. Click any for full details.</p>
       </div>
       <div class="home-card" onclick="showPage('match')">
         <div class="icon">🧩</div><h3>Match Game</h3>
-        <p>Match events with dates, eras, and impact. Race the clock and beat your best time.</p>
+        <p>Match events with dates and impact. Race the clock and beat your best time.</p>
       </div>
     </div>
 
@@ -671,9 +671,8 @@ function fmtMs(ms) {
 // ─── QUIZ ────────────────────────────────────────────
 let quizState=null, quizCount=10, quizMode='normal';
 const QUIZ_PARTS = [
-  { key:'name', label:'Name:', desc:'Title' },
-  { key:'artist', label:'Artist:', desc:'Author' },
-  { key:'era', label:'Era:', desc:'Era' },
+  { key:'name', label:'Name:', desc:'Event' },
+  { key:'artist', label:'Artist:', desc:'Date' },
   { key:'significance', label:'Significance:', desc:'Significance' },
 ];
 let selectedQuizParts = new Set(QUIZ_PARTS.map(p=>p.key));
@@ -973,7 +972,6 @@ function renderFC(){
         <div class="fc-back">
           <div class="fc-back-title">${card.name}</div>
           <div class="fc-back-artist">${card.artist}</div>
-          <div class="fc-back-era">${card.era}</div>
           <div class="fc-back-sig">${card.sig}</div>
         </div>
       </div>
@@ -1056,52 +1054,21 @@ function getDateStr(c){ return DATE_MAP[c.name]||''; }
 
 function initTimeline(){
   const w=document.getElementById('timeline-wrapper');
-  const groups={};
-
-  CARDS.forEach(c=>{
-    const era=getStyle(c);
-    if(!groups[era])groups[era]=[];
-    groups[era].push(c);
-  });
-
-  // Sort cards within each era chronologically.
-  Object.values(groups).forEach(cards=>cards.sort((a,b)=>{
+  const cards=[...CARDS].sort((a,b)=>{
     const da=parseInt(DATE_MAP[a.name])||0;
     const db=parseInt(DATE_MAP[b.name])||0;
     return da-db;
-  }));
-
-  // Sort eras by each era's earliest artwork date.
-  const orderedEras=Object.keys(groups).sort((eraA,eraB)=>{
-    const firstA=parseInt(DATE_MAP[groups[eraA][0]?.name])||Number.POSITIVE_INFINITY;
-    const firstB=parseInt(DATE_MAP[groups[eraB][0]?.name])||Number.POSITIVE_INFINITY;
-    if(firstA!==firstB)return firstA-firstB;
-
-    const idxA=ERA_ORDER.indexOf(eraA);
-    const idxB=ERA_ORDER.indexOf(eraB);
-    const normA=idxA===-1?Number.POSITIVE_INFINITY:idxA;
-    const normB=idxB===-1?Number.POSITIVE_INFINITY:idxB;
-    if(normA!==normB)return normA-normB;
-
-    return eraA.localeCompare(eraB);
   });
 
-  let html='';
-  orderedEras.forEach(era=>{
-    html+=`<div class="tl-era"><div class="tl-era-title">${era}</div><div class="tl-grid">`;
-    groups[era].forEach(c=>{
-      const cardIndex = CARDS.indexOf(c);
-      html+=`<div class="tl-item" onclick="openModalByIndex(${cardIndex})">
-        <img src="${c.image}" alt="${c.name}">
-        <div class="tl-item-date">${getDateStr(c)}</div>
-        <div class="tl-item-title">${c.name}</div>
-        <div class="tl-item-artist">${c.artist}</div>
-      </div>`;
-    });
-    html+='</div></div>';
-  });
-
-  w.innerHTML=html;
+  w.innerHTML=`<div class="tl-grid">${cards.map(c=>{
+    const cardIndex = CARDS.indexOf(c);
+    return `<div class="tl-item" onclick="openModalByIndex(${cardIndex})">
+      <img src="${c.image}" alt="${c.name}">
+      <div class="tl-item-date">${getDateStr(c)}</div>
+      <div class="tl-item-title">${c.name}</div>
+      <div class="tl-item-artist">${c.artist}</div>
+    </div>`;
+  }).join('')}</div>`;
 }
 
 // ─── MODAL ───────────────────────────────────────────
@@ -1114,7 +1081,7 @@ function openModal(card){
   document.getElementById('modal-img').src=card.image;
   document.getElementById('modal-title').textContent=card.name;
   document.getElementById('modal-meta').textContent=`${card.artist}  ·  ${getDateStr(card)}`;
-  document.getElementById('modal-era').textContent=getStyle(card)+' · AP Era: '+card.era;
+  document.getElementById('modal-era').style.display='none';
   document.getElementById('modal-sig').textContent=card.sig;
   document.getElementById('modal-overlay').classList.add('open');
 }
@@ -1133,7 +1100,7 @@ function initSpeed() {
     <div class="quiz-setup">
       <div style="font-size:36px;margin-bottom:14px">⚡</div>
       <h3>Speed Round</h3>
-      <p>10 seconds per question. Pick the correct Era and Significance — no typing. How many can you get?</p>
+      <p>10 seconds per question. Pick the correct Significance — no typing. How many can you get?</p>
       <div style="display:flex;gap:10px;justify-content:center;margin-top:8px">
         <button class="btn" onclick="startSpeed(10)">10 Questions</button>
         <button class="btn outline" onclick="startSpeed(20)">20 Questions</button>
@@ -1164,7 +1131,7 @@ function renderSpeed() {
   document.getElementById('speed-mode-label').textContent = `${index+1} / ${total}`;
 
   // Only show MC fields for speed round
-  const mcAnswers = q.answers.filter(a=>a.type!=='text-input');
+  const mcAnswers = q.answers.filter(a=>a.label==='Significance:');
   let fieldsHtml = mcAnswers.map((ans,ai)=>{
     const isEra = ans.label==='Era:';
     const cls = isEra ? 'mc-options-grid' : 'mc-options-col';
@@ -1257,7 +1224,7 @@ function speedFlash(type) {
     w.style.borderRadius='12px';
     // Show correct answer hint if wrong/timeout
     const q = speedState.questions[speedState.index];
-    const mcAnswers = q.answers.filter(a=>a.type!=='text-input');
+    const mcAnswers = q.answers.filter(a=>a.label==='Significance:');
     mcAnswers.forEach((ans,ai)=>{
       document.querySelectorAll(`.mc-option[data-ai="${ai}"]`).forEach(b=>{
         b.disabled=true;
@@ -1310,14 +1277,12 @@ function setMatchMode(mode){
 
 function getMatchLabel(card,mode){
   if(mode==='artist') return card.artist || 'Unknown Date';
-  if(mode==='era') return card.era || 'Unknown Era';
   if(mode==='significance') return card.sigShort || 'Major turning point that reshaped Europe.';
   return card.name || 'Untitled';
 }
 
 function getMatchModeLabel(mode){
   if(mode==='artist') return 'Date';
-  if(mode==='era') return 'Era';
   if(mode==='significance') return 'Impact';
   return 'Event';
 }
@@ -1327,9 +1292,9 @@ function initMatch(){
     <div style="text-align:center;padding:40px 0">
       <div style="font-size:40px;margin-bottom:16px">⚡</div>
       <h3 style="font-size:17px;margin-bottom:8px">Match Game</h3>
-      <p style="font-size:13px;color:var(--text-dim);margin-bottom:14px">Match event cards to the correct event, date, era, or impact. Race the clock!</p>
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:14px">Match event cards to the correct event, date, or impact. Race the clock!</p>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px">
-        ${['title','artist','era','significance'].map(mode=>`
+        ${['title','artist','significance'].map(mode=>`
           <button class="btn ${matchSetupMode===mode?'':'outline'} sm" onclick="setMatchMode('${mode}')">${getMatchModeLabel(mode)}</button>
         `).join('')}
       </div>
