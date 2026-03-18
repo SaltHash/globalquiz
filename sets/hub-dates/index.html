@@ -160,6 +160,7 @@
   .quiz-part-chip:hover { border-color: var(--purple); color: var(--text); }
   .quiz-part-chip input { accent-color: var(--purple); }
   .quiz-part-note { font-size: 11px; color: var(--text-dim); margin-bottom: 18px; }
+  .quiz-part-warn { font-size: 11px; color: var(--yellow); margin-top: 8px; }
   .quiz-progress { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
   .quiz-progress-bar { flex: 1; height: 4px; background: var(--bg3); border-radius: 99px; overflow: hidden; }
   .quiz-progress-fill { height: 100%; background: var(--purple); border-radius: 99px; transition: width 0.3s; }
@@ -283,6 +284,29 @@
   .match-done .time { font-size: 36px; font-weight: 700; color: var(--purple); margin-bottom: 8px; }
   .match-done p { color: var(--text-dim); font-size: 13px; margin-bottom: 24px; }
 
+  /* SIGNIFICANCE LAB */
+  .siglab-setup, .siglab-card, .siglab-score {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+  }
+  .siglab-setup p, .siglab-score p { font-size: 12px; margin-bottom: 14px; color: var(--text-dim); }
+  .siglab-frag-grid { display: grid; gap: 10px; margin-top: 14px; }
+  .siglab-frag {
+    width: 100%; text-align: left; border: 1px solid var(--border); border-radius: 10px;
+    background: var(--bg3); color: var(--text); font-family: 'Monda', sans-serif;
+    font-size: 12px; padding: 11px 12px; cursor: pointer; transition: all 0.15s;
+  }
+  .siglab-frag:hover:not(:disabled) { border-color: var(--purple); }
+  .siglab-frag.selected { border-color: var(--purple); background: var(--purple-dim); }
+  .siglab-frag.correct { border-color: var(--green); background: rgba(74,222,128,0.12); }
+  .siglab-frag.wrong { border-color: var(--red); background: rgba(248,113,113,0.12); }
+  .siglab-frag:disabled { cursor: default; opacity: 0.9; }
+  .siglab-counter { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; }
+  .siglab-event { font-size: 18px; color: var(--purple); font-weight: 700; margin-bottom: 6px; }
+  .siglab-meta { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; }
+
   /* MODAL */
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.72); z-index: 200;
@@ -353,6 +377,10 @@
         <div class="icon">🧩</div><h3>Match Game</h3>
         <p>Match events with dates and impact. Race the clock and beat your best time.</p>
       </div>
+      <div class="home-card" onclick="showPage('siglab')">
+        <div class="icon">🧠</div><h3>Significance Lab</h3>
+        <p>Build causal chains from historical impact fragments. Train deeper significance reasoning.</p>
+      </div>
     </div>
 
     <div class="stats-section">
@@ -417,6 +445,11 @@
     <div id="speed-wrapper"></div>
   </div>
 
+  <div class="page" id="page-siglab">
+    <h2 class="page-title">Significance Lab</h2>
+    <div id="siglab-wrapper"></div>
+  </div>
+
   <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
     <div class="modal">
       <button class="modal-close" onclick="closeModal()">✕ Close</button>
@@ -456,7 +489,7 @@ function saveFCState(deck) {
 function loadFCState() { return LS.get('fc_deck'); }
 
 // ─── NAV ─────────────────────────────────────────────
-const pages = ['home','quiz','speed','flashcards','timeline','match'];
+const pages = ['home','quiz','speed','flashcards','timeline','match','siglab'];
 function showPage(name) {
   pages.forEach(p => document.getElementById('page-'+p).classList.toggle('active', p===name));
   if(name==='home') renderHomeStats();
@@ -465,6 +498,7 @@ function showPage(name) {
   if(name==='flashcards') initFlashcards();
   if(name==='timeline') initTimeline();
   if(name==='match') initMatch();
+  if(name==='siglab') initSigLab();
 }
 
 // ─── COLLAPSIBLES ────────────────────────────────────
@@ -678,6 +712,38 @@ const QUIZ_PARTS = [
 ];
 let selectedQuizParts = new Set(QUIZ_PARTS.map(p=>p.key));
 
+function getPartValue(question, partKey){
+  if(partKey==='name') return question.answers.find(a=>a.label==='Event:')?.correct || '';
+  if(partKey==='artist') return question.answers.find(a=>a.label==='Year:')?.correct || '';
+  if(partKey==='significance') return question.significanceShort || question.answers.find(a=>a.label==='Significance:')?.correct || '';
+  return '';
+}
+
+function getPromptLabel(partKey){
+  if(partKey==='name') return 'Event';
+  if(partKey==='artist') return 'Date';
+  if(partKey==='significance') return 'Significance';
+  return 'Prompt';
+}
+
+function buildQuestionPrompt(question, promptPart){
+  const value = getPartValue(question, promptPart);
+  return `${getPromptLabel(promptPart)} Prompt: ${value}`;
+}
+
+function pickPromptPart(enabledParts){
+  const parts = [...enabledParts];
+  return parts[Math.floor(Math.random()*parts.length)];
+}
+
+function renderQuizPartWarning() {
+  const warn = document.getElementById('quiz-part-warn');
+  if(!warn) return;
+  warn.textContent = selectedQuizParts.size < 2
+    ? 'Select at least two study types so the quiz can show one as a prompt and ask for the other type(s).'
+    : '';
+}
+
 function initQuizSetup() {
   document.getElementById('quiz-mode-label').textContent='';
   const total=quizData.length;
@@ -701,14 +767,15 @@ function initQuizSetup() {
           <div class="mode-desc">${hasWrong?wrongIds.length+' missed from last quiz':'No missed questions yet'}</div>
         </button>
       </div>
-      <p style="margin-bottom:8px;font-size:13px;color:var(--text-dim)">Quiz parts</p>
+      <p style="margin-bottom:8px;font-size:13px;color:var(--text-dim)">Study types</p>
       <div class="quiz-part-grid" id="quiz-part-grid">
         ${QUIZ_PARTS.map(part=>`<label class="quiz-part-chip">
           <input type="checkbox" data-part="${part.key}" ${selectedQuizParts.has(part.key)?'checked':''} onchange="toggleQuizPart('${part.key}', this.checked)">
           <span>${part.desc}</span>
         </label>`).join('')}
       </div>
-      <div class="quiz-part-note">Use the provided prompt to fill in what you know.</div>
+      <div class="quiz-part-note">Each question shows one active type as a prompt and asks for the remaining active type(s).</div>
+      <div id="quiz-part-warn" class="quiz-part-warn"></div>
       <p style="margin-bottom:10px;font-size:13px;color:var(--text-dim)">How many questions?</p>
       <div class="quiz-count-grid" id="quiz-count-grid">
         ${opts.map(n=>`<button class="quiz-count-btn${n===quizCount?' active':''}" onclick="setQuizCount(${n},this)">${n===total?'All ('+total+')':n}</button>`).join('')}
@@ -716,8 +783,8 @@ function initQuizSetup() {
       <button class="btn" onclick="startQuiz()">Start Quiz →</button>
     </div>
   `;
-  // hide count selector for wrong-only mode
   if(quizMode==='wrong') document.getElementById('quiz-count-grid').style.display='none';
+  renderQuizPartWarning();
 }
 
 function setQuizMode(mode, btn) {
@@ -736,15 +803,15 @@ function setQuizCount(n,btn) {
 
 function toggleQuizPart(partKey, enabled) {
   if(enabled) selectedQuizParts.add(partKey);
-  else if(selectedQuizParts.size > 1) selectedQuizParts.delete(partKey);
-  else {
-    const cb = document.querySelector(`#quiz-part-grid input[data-part="${partKey}"]`);
-    if(cb) cb.checked = true;
-    alert('Pick at least one quiz part.');
-  }
+  else selectedQuizParts.delete(partKey);
+  renderQuizPartWarning();
 }
 
 function startQuiz() {
+  if(selectedQuizParts.size < 2) {
+    alert('Pick at least two study types before starting.');
+    return;
+  }
   let pool;
   if(quizMode==='wrong') {
     const wrongIds = LS.get('quiz_wrong_ids') || [];
@@ -754,7 +821,9 @@ function startQuiz() {
   } else {
     pool = [...quizData].sort(()=>Math.random()-0.5).slice(0,quizCount);
   }
-  quizState={ questions:pool, index:0, correct:0, submitted:false, startTime:Date.now(), wrongNames:[], parts:[...selectedQuizParts] };
+  const enabledParts = new Set(selectedQuizParts);
+  const questions = pool.map(q => ({ ...q, promptPart: pickPromptPart(enabledParts) }));
+  quizState={ questions, index:0, correct:0, submitted:false, startTime:Date.now(), wrongNames:[], parts:[...selectedQuizParts] };
   renderQuiz();
 }
 
@@ -772,7 +841,7 @@ function renderQuiz() {
       <div class="quiz-counter">${index+1}/${questions.length}</div>
     </div>
     <div class="quiz-card">
-      <div class="quiz-image-area"><div class="quiz-prompt">${q.prompt || `${q.answers.find(a=>a.label==='Year:')?.correct || ''} — ${q.answers.find(a=>a.label==='Event:')?.correct || ''}`}</div></div>
+      <div class="quiz-image-area"><div class="quiz-prompt">${buildQuestionPrompt(q, q.promptPart)}</div></div>
       <div class="quiz-body">
         <div class="quiz-fields" id="quiz-fields"></div>
         <div class="quiz-feedback" id="quiz-feedback"></div>
@@ -783,7 +852,7 @@ function renderQuiz() {
   const fieldsEl=document.getElementById('quiz-fields');
   q.answers.forEach((ans,ai)=>{
     const part = QUIZ_PARTS.find(p=>p.label===ans.label);
-    if(part && !activeParts.has(part.key)) return;
+    if(part && (!activeParts.has(part.key) || q.promptPart===part.key)) return;
     const div=document.createElement('div');
     div.className='quiz-field'; div.dataset.index=ai;
     if(ans.type==='text-input'){
@@ -811,7 +880,7 @@ function selectMC(btn){
 function normalizeAnswerText(text){
   return (text||'')
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g,'')
+    .replace(/[̀-ͯ]/g,'')
     .toLowerCase()
     .trim();
 }
@@ -853,10 +922,9 @@ function submitQuiz(){
   const q=quizState.questions[quizState.index];
   const activeParts = new Set(quizState.parts || QUIZ_PARTS.map(p=>p.key));
   let allCorrect=true;
-  const corrections=[];
   q.answers.forEach((ans,ai)=>{
     const part = QUIZ_PARTS.find(p=>p.label===ans.label);
-    if(part && !activeParts.has(part.key)) return;
+    if(part && (!activeParts.has(part.key) || q.promptPart===part.key)) return;
     if(ans.type==='text-input'){
       const input=document.getElementById(`qf-${ai}`);
       const ok=isAnswerNinetyPercentCorrect(input.value, ans.correct);
@@ -867,7 +935,6 @@ function submitQuiz(){
         hint.style.cssText='font-size:11px;color:var(--green);margin-top:5px;padding:5px 10px;background:rgba(74,222,128,0.08);border-radius:6px;border-left:2px solid var(--green)';
         hint.textContent='✓ Correct: '+ans.correct;
         input.parentNode.appendChild(hint);
-        corrections.push(ans.label.replace(':','')+': '+ans.correct);
       }
     } else {
       const sel=document.querySelector(`.mc-option[data-ai="${ai}"].selected`);
@@ -877,13 +944,11 @@ function submitQuiz(){
       });
       if(!sel||decodeURIComponent(sel.dataset.val)!==ans.correct){
         allCorrect=false; if(sel)sel.classList.add('wrong');
-        corrections.push(ans.label.replace(':','')+': '+ans.correct);
       }
     }
   });
   if(allCorrect)quizState.correct++;
   else {
-    // record this artwork name as wrong
     const nameAns = q.answers.find(a=>a.label==='Event:');
     if(nameAns) quizState.wrongNames.push(nameAns.correct);
   }
@@ -894,37 +959,6 @@ function submitQuiz(){
 }
 
 function nextQuiz(){ quizState.index++; renderQuiz(); }
-
-function renderQuizScore(){
-  const w=document.getElementById('quiz-wrapper');
-  const {correct,questions,startTime,wrongNames}=quizState;
-  const elapsed=Date.now()-startTime;
-  const pct=Math.round((correct/questions.length)*100);
-  saveQuizResult(pct,correct,questions.length,elapsed);
-  // Save wrong answer names for Wrong Answers Only mode
-  if(wrongNames && wrongNames.length) LS.set('quiz_wrong_ids', wrongNames);
-  else if(quizMode!=='wrong') LS.set('quiz_wrong_ids', []); // perfect score clears it
-  const wrongBtn = wrongNames&&wrongNames.length ? `<button class="btn outline" style="border-color:var(--red);color:var(--red)" onclick="setModeWrong()">🔁 Retry ${wrongNames.length} Missed</button>` : '';
-  w.innerHTML=`
-    <div class="quiz-score-screen">
-      <div class="score-ring">${pct}%</div>
-      <h3>${correct} / ${questions.length} correct</h3>
-      <div class="quiz-timer-display">⏱ Completed in ${fmtMs(elapsed)}</div>
-      <p>${pct>=80?'Great work! Ready for the test.':pct>=50?'Getting there — keep reviewing!':'More practice needed. Try flashcards!'}</p>
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-        <button class="btn" onclick="startQuiz()">Try Again</button>
-        ${wrongBtn}
-        <button class="btn outline" onclick="initQuizSetup()">Change Mode</button>
-      </div>
-    </div>
-  `;
-  document.getElementById('quiz-mode-label').textContent='';
-}
-
-function setModeWrong() {
-  quizMode='wrong';
-  startQuiz();
-}
 
 // ─── FLASHCARDS ──────────────────────────────────────
 let fcState=null;
@@ -1228,6 +1262,121 @@ function finishSpeed() {
   `;
 }
 
+// ─── SIGNIFICANCE LAB ─────────────────────────────────
+let sigLabState = null;
+
+function initSigLab(){
+  sigLabState = null;
+  document.getElementById('siglab-wrapper').innerHTML = `
+    <div class="siglab-setup">
+      <div style="font-size:36px;margin-bottom:12px">🧠</div>
+      <h3 style="margin-bottom:8px">Causal Chain Lab</h3>
+      <p>This mode is built specifically for significance study. For each event, pick the <strong>three fragments</strong> that form the best historical impact chain (cause → shift → legacy).</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" onclick="startSigLab(6)">Start 6 Events</button>
+        <button class="btn outline" onclick="startSigLab(10)">Start 10 Events</button>
+      </div>
+    </div>
+  `;
+}
+
+function buildSigLabRound(question){
+  const chain = [...(question.significanceChain || [question.significanceShort])].slice(0,3);
+  while(chain.length < 3) chain.push(question.significanceShort);
+  const distractors = [...quizData]
+    .filter(q => q !== question)
+    .sort(()=>Math.random()-0.5)
+    .slice(0,3)
+    .map(q => (q.significanceChain && q.significanceChain[0]) || q.significanceShort)
+    .map(t => t.length > 115 ? t.slice(0,112) + '...' : t);
+  const fragments = [...chain, ...distractors].sort(()=>Math.random()-0.5);
+  return { question, chain, fragments, picks: [], checked: false, correct: false };
+}
+
+function startSigLab(n){
+  const questions = [...quizData].sort(()=>Math.random()-0.5).slice(0,n).map(buildSigLabRound);
+  sigLabState = { rounds: questions, index: 0, correct: 0, startTime: Date.now() };
+  renderSigLab();
+}
+
+function renderSigLab(){
+  if(!sigLabState) return initSigLab();
+  const { rounds, index } = sigLabState;
+  if(index >= rounds.length) return finishSigLab();
+  const round = rounds[index];
+  const event = round.question.answers.find(a=>a.label==='Event:')?.correct || 'Unknown event';
+  const year = round.question.answers.find(a=>a.label==='Year:')?.correct || '';
+
+  document.getElementById('siglab-wrapper').innerHTML = `
+    <div class="siglab-card">
+      <div class="siglab-counter">${index+1}/${rounds.length}</div>
+      <div class="siglab-event">${event}</div>
+      <div class="siglab-meta">${year} · Pick 3 fragments in impact order.</div>
+      <div class="siglab-frag-grid">
+        ${round.fragments.map((frag, i)=>`<button class="siglab-frag${round.picks.includes(i)?' selected':''}" onclick="toggleSigFrag(${i})" ${round.checked?'disabled':''}>${frag}</button>`).join('')}
+      </div>
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" onclick="checkSigLabRound()" ${round.picks.length!==3 || round.checked ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Check Chain</button>
+        <button class="btn outline" onclick="nextSigLabRound()" ${!round.checked ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Next →</button>
+      </div>
+    </div>
+  `;
+
+  if(round.checked) {
+    const buttons = [...document.querySelectorAll('.siglab-frag')];
+    buttons.forEach((btn, i) => {
+      const isChosen = round.picks.includes(i);
+      const shouldBe = round.chain.includes(round.fragments[i]);
+      if(shouldBe) btn.classList.add('correct');
+      if(isChosen && !shouldBe) btn.classList.add('wrong');
+    });
+  }
+}
+
+function toggleSigFrag(i){
+  const round = sigLabState.rounds[sigLabState.index];
+  if(round.checked) return;
+  if(round.picks.includes(i)) round.picks = round.picks.filter(x=>x!==i);
+  else if(round.picks.length < 3) round.picks.push(i);
+  renderSigLab();
+}
+
+function checkSigLabRound(){
+  const round = sigLabState.rounds[sigLabState.index];
+  if(round.checked || round.picks.length!==3) return;
+  const pickedTexts = round.picks.map(i=>round.fragments[i]);
+  const isCorrect = pickedTexts.every((t,i)=>t===round.chain[i]);
+  round.checked = true;
+  round.correct = isCorrect;
+  if(isCorrect) sigLabState.correct++;
+  renderSigLab();
+}
+
+function nextSigLabRound(){
+  const round = sigLabState.rounds[sigLabState.index];
+  if(!round.checked) return;
+  sigLabState.index++;
+  renderSigLab();
+}
+
+function finishSigLab(){
+  const { rounds, correct, startTime } = sigLabState;
+  const elapsed = Date.now() - startTime;
+  const pct = Math.round((correct/rounds.length)*100);
+  saveQuizResult(pct, correct, rounds.length, elapsed);
+  document.getElementById('siglab-wrapper').innerHTML = `
+    <div class="siglab-score">
+      <div style="font-size:36px;margin-bottom:10px">🧠</div>
+      <h3 style="margin-bottom:8px">Causal Chain Complete</h3>
+      <p>${correct}/${rounds.length} chains in correct order · ${fmtMs(elapsed)}</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" onclick="startSigLab(${rounds.length})">Play Again</button>
+        <button class="btn outline" onclick="initSigLab()">Change Length</button>
+      </div>
+    </div>
+  `;
+}
+
 // ─── MATCH ───────────────────────────────────────────
 let matchState=null;
 let matchSetupMode='name';
@@ -1355,7 +1504,8 @@ function finishMatch(){
 }
 
 // ─── INIT ────────────────────────────────────────────
-document.getElementById('home-count').textContent=CARDS.length;
+const homeCount = document.getElementById('home-count');
+if(homeCount) homeCount.textContent=CARDS.length;
 renderHomeStats();
 </script>
 </body>
