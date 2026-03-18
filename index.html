@@ -25,7 +25,8 @@
       height: 56px; position: sticky; top: 0; z-index: 100;
     }
     .logo { display:inline-flex; align-items:center; gap:8px; color: var(--accent); font-weight: 700; font-size: 15px; margin-right: 20px; letter-spacing: 0.5px; text-decoration:none; }
-    .logo-mark { font-size:16px; line-height:1; display:inline-flex; align-items:center; }
+    .logo-mark { width:16px; height:16px; line-height:1; display:inline-flex; align-items:center; justify-content:center; }
+    .logo-mark svg { width:16px; height:16px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
     nav .nav-link {
       text-decoration: none; color: var(--text-dim);
       font-family: 'Monda', sans-serif; font-size: 13px; padding: 8px 14px;
@@ -47,7 +48,7 @@
 </head>
 <body>
   <nav>
-    <a class="logo" href="index.html"><span class="logo-mark">🌍</span><span>GlobalQuiz</span></a>
+    <a class="logo" href="index.html"><span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18"></path><path d="M12 3a15 15 0 0 1 0 18"></path><path d="M12 3a15 15 0 0 0 0 18"></path></svg></span><span>GlobalQuiz</span></a>
     <a class="nav-link" href="sets/artists-and-works/index.html">Artists and Works</a>
     <a class="nav-link" href="sets/hub-dates/index.html">HUB Dates</a>
   </nav>
