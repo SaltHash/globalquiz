@@ -10,6 +10,32 @@ function buildSignificanceChain(item) {
   return chain.map(c => c[0]?.toUpperCase() + c.slice(1));
 }
 
+function removeEventNameParts(text, eventName) {
+  if(!text) return '';
+  const stopWords = new Set(['of','the','and','in','on','to','for','a','an','by','with','from','at']);
+  const eventWords = (eventName || '')
+    .toLowerCase()
+    .replace(/[^\w\s’']/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 2 && !stopWords.has(w));
+  if(!eventWords.length) return text;
+
+  let output = text;
+  eventWords.forEach(word => {
+    const pattern = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
+    output = output.replace(pattern, '');
+  });
+  return output
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\s+([.,;:!?])/g, '$1')
+    .trim();
+}
+
+function sanitizeSignificance(text, eventName) {
+  const withoutDates = (text || '').replace(/\b\d{3,4}\b/g, '').trim();
+  return removeEventNameParts(withoutDates, eventName);
+}
+
 const quizData = [
   {
     year: "1350",
@@ -251,21 +277,27 @@ const quizData = [
       "It was mostly symbolic and left state coordination unchanged."
     ]
   }
-].map((item) => ({
+].map((item) => {
+  const significanceLong = sanitizeSignificance(item.significanceLong, item.event);
+  const significanceShort = sanitizeSignificance(item.significanceShort, item.event);
+  const significanceOptions = (item.significanceOptions || []).map(option => sanitizeSignificance(option, item.event));
+  const cleanedItem = { ...item, significanceLong, significanceShort, significanceOptions };
+  return ({
   type: 'text',
-  prompt: `${item.year} — ${item.event}`,
-  era: item.era,
+  prompt: `${cleanedItem.year} — ${cleanedItem.event}`,
+  era: cleanedItem.era,
   answers: [
-    { type: 'text-input', label: 'Event:', correct: item.event },
-    { type: 'text-input', label: 'Year:', correct: item.year },
+    { type: 'text-input', label: 'Event:', correct: cleanedItem.event },
+    { type: 'text-input', label: 'Year:', correct: cleanedItem.year },
     {
       type: 'text-mc',
       label: 'Significance:',
-      options: item.significanceOptions,
-      correct: item.significanceShort
+      options: cleanedItem.significanceOptions,
+      correct: cleanedItem.significanceShort
     }
   ],
-  significanceLong: item.significanceLong,
-  significanceShort: item.significanceShort,
-  significanceChain: item.significanceChain || buildSignificanceChain(item)
-}));
+  significanceLong: cleanedItem.significanceLong,
+  significanceShort: cleanedItem.significanceShort,
+  significanceChain: cleanedItem.significanceChain || buildSignificanceChain(cleanedItem)
+  });
+});
