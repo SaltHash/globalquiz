@@ -1335,7 +1335,7 @@ function initSigLab(){
 }
 
 function buildSigLabRound(question){
-  return { question, answer: '', grade: null };
+  return { question, answer: '', grade: null, submitted: false };
 }
 
 function startSigLab(n){
@@ -1356,20 +1356,20 @@ function renderSigLab(){
     <div class="siglab-card">
       <div class="siglab-counter">${index+1}/${rounds.length}</div>
       <div class="siglab-event">${event}</div>
-      <div class="siglab-meta">${year} · Write a concise significance explanation.</div>
-      <div class="siglab-rubric">
-        <strong>Rubric (2 points total)</strong><br>
-        <strong>2/2:</strong> clear historical impact + broader consequence.<br>
-        <strong>1/2:</strong> partially correct impact but missing depth/scope.<br>
-        <strong>0/2:</strong> vague, inaccurate, or mostly restates the event.
-      </div>
+      <div class="siglab-meta">${year} · Write your significance, then submit to reveal the full significance rubric.</div>
       <label style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.8px">Your significance answer</label>
-      <textarea class="siglab-input" placeholder="Explain why this event matters..." onchange="setSigLabAnswer(this.value)" oninput="setSigLabAnswer(this.value)">${round.answer || ''}</textarea>
+      <textarea class="siglab-input" placeholder="Explain why this event matters..." onchange="setSigLabAnswer(this.value)" oninput="setSigLabAnswer(this.value)" ${round.submitted ? 'disabled' : ''}>${round.answer || ''}</textarea>
+      ${round.submitted ? `
+      <div class="siglab-rubric">
+        <strong>Detailed significance rubric (from data)</strong><br>
+        ${round.question.significanceLong}
+      </div>` : ''}
       <div class="siglab-grade-grid">
-        ${[0,1,2].map(score=>`<button class="siglab-grade-btn${round.grade===score?' selected':''}" onclick="setSigLabGrade(${score})">${score} / 2</button>`).join('')}
+        ${[0,1,2].map(score=>`<button class="siglab-grade-btn${round.grade===score?' selected':''}" onclick="setSigLabGrade(${score})" ${!round.submitted ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${score} / 2</button>`).join('')}
       </div>
       <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn outline" onclick="nextSigLabRound()" ${round.grade===null ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Next</button>
+        <button class="btn" onclick="submitSigLabAnswer()" ${round.submitted || !round.answer.trim() ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Submit Answer</button>
+        <button class="btn outline" onclick="nextSigLabRound()" ${!round.submitted || round.grade===null ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Next</button>
       </div>
     </div>
   `;
@@ -1382,7 +1382,15 @@ function setSigLabAnswer(text){
 
 function setSigLabGrade(score){
   const round = sigLabState.rounds[sigLabState.index];
+  if(!round.submitted) return;
   round.grade = score;
+  renderSigLab();
+}
+
+function submitSigLabAnswer(){
+  const round = sigLabState.rounds[sigLabState.index];
+  if(round.submitted || !round.answer.trim()) return;
+  round.submitted = true;
   renderSigLab();
 }
 
