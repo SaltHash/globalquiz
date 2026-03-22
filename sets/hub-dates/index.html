@@ -1323,7 +1323,6 @@ function initSigLab(){
   sigLabState = null;
   document.getElementById('siglab-wrapper').innerHTML = `
     <div class="siglab-setup">
-      <div class="hero-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3a3 3 0 0 0-3 3v1a3 3 0 0 0-2 2.8A3 3 0 0 0 6 13v1a3 3 0 0 0 3 3"></path><path d="M15 3a3 3 0 0 1 3 3v1a3 3 0 0 1 2 2.8A3 3 0 0 1 18 13v1a3 3 0 0 1-3 3"></path><path d="M12 3v18"></path><path d="M9 7h6M9 12h6M9 17h6"></path></svg></div>
       <h3 style="margin-bottom:8px">Manual Significance Quiz</h3>
       <p>Type a significance response, use the rubric, and then self-grade with <strong>0, 1, or 2</strong> points per event.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -1361,7 +1360,7 @@ function renderSigLab(){
       <textarea class="siglab-input" placeholder="Explain why this event matters..." onchange="setSigLabAnswer(this.value)" oninput="setSigLabAnswer(this.value)" ${round.submitted ? 'disabled' : ''}>${round.answer || ''}</textarea>
       ${round.submitted ? `
       <div class="siglab-rubric">
-        <strong>Detailed significance rubric (from data)</strong><br>
+        <strong>Sample response:</strong><br>
         ${round.question.significanceLong}
       </div>` : ''}
       <div class="siglab-grade-grid">
@@ -1415,7 +1414,6 @@ function finishSigLab(){
   saveQuizResult(pct, totalPoints, maxPoints, elapsed);
   document.getElementById('siglab-wrapper').innerHTML = `
     <div class="siglab-score">
-      <div class="hero-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3a3 3 0 0 0-3 3v1a3 3 0 0 0-2 2.8A3 3 0 0 0 6 13v1a3 3 0 0 0 3 3"></path><path d="M15 3a3 3 0 0 1 3 3v1a3 3 0 0 1 2 2.8A3 3 0 0 1 18 13v1a3 3 0 0 1-3 3"></path><path d="M12 3v18"></path><path d="M9 7h6M9 12h6M9 17h6"></path></svg></div>
       <h3 style="margin-bottom:8px">Manual Grading Complete</h3>
       <p>${totalPoints}/${maxPoints} points · ${fmtMs(elapsed)}</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
