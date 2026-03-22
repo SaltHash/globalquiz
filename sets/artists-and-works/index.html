@@ -1118,6 +1118,92 @@
                 margin-bottom: 24px;
             }
 
+            .siglab-setup,
+            .siglab-card,
+            .siglab-score {
+                background: var(--bg2);
+                border: 1px solid var(--border);
+                border-radius: 14px;
+                padding: 22px;
+            }
+            .siglab-setup p,
+            .siglab-score p {
+                font-size: 13px;
+                color: var(--text-dim);
+                margin-bottom: 16px;
+            }
+            .siglab-counter {
+                font-size: 12px;
+                color: var(--text-dim);
+                margin-bottom: 6px;
+            }
+            .siglab-event {
+                font-size: 18px;
+                font-weight: 700;
+                margin-bottom: 6px;
+                color: var(--text);
+            }
+            .siglab-meta {
+                font-size: 12px;
+                color: var(--text-dim);
+                margin-bottom: 14px;
+            }
+            .siglab-rubric {
+                margin-top: 12px;
+                background: var(--bg3);
+                border: 1px solid var(--border);
+                border-left: 3px solid var(--accent);
+                border-radius: 10px;
+                padding: 12px;
+                font-size: 13px;
+                line-height: 1.55;
+                color: var(--text);
+            }
+            .siglab-input {
+                width: 100%;
+                min-height: 110px;
+                resize: vertical;
+                margin-top: 8px;
+                padding: 10px;
+                border-radius: 10px;
+                border: 1px solid var(--border);
+                background: var(--bg3);
+                color: var(--text);
+                font-family: "Monda", sans-serif;
+                font-size: 13px;
+                line-height: 1.5;
+            }
+            .siglab-input:focus {
+                outline: 1px solid var(--accent);
+            }
+            .siglab-grade-grid {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 8px;
+                margin-top: 12px;
+            }
+            .siglab-grade-btn {
+                border: 1px solid var(--border);
+                background: var(--bg3);
+                color: var(--text);
+                border-radius: 9px;
+                padding: 10px;
+                cursor: pointer;
+                font-family: "Monda", sans-serif;
+                font-size: 12px;
+                transition: all 0.15s;
+            }
+            .siglab-grade-btn:hover {
+                border-color: var(--accent);
+                color: var(--accent);
+            }
+            .siglab-grade-btn.selected {
+                border-color: var(--accent);
+                background: var(--accent-dim);
+                color: var(--accent);
+                font-weight: 700;
+            }
+
             /* MODAL */
             .modal-overlay {
                 position: fixed;
@@ -1306,27 +1392,9 @@
                     <div class="home-card" onclick="showPage('match')">
                         <div class="icon" aria-hidden="true">
                             <svg viewBox="0 0 24 24">
-                                <rect
-                                    x="3"
-                                    y="4"
-                                    width="8"
-                                    height="8"
-                                    rx="1.5"
-                                />
-                                <rect
-                                    x="13"
-                                    y="4"
-                                    width="8"
-                                    height="8"
-                                    rx="1.5"
-                                />
-                                <rect
-                                    x="3"
-                                    y="14"
-                                    width="8"
-                                    height="8"
-                                    rx="1.5"
-                                />
+                                <rect x="3" y="4" width="8" height="8" rx="1.5" />
+                                <rect x="13" y="4" width="8" height="8" rx="1.5" />
+                                <rect x="3" y="14" width="8" height="8" rx="1.5" />
                                 <path d="M16.5 14h1a3.5 3.5 0 0 1 0 7h-1" />
                                 <path d="M16.5 17.5h-5.5" />
                             </svg>
@@ -1337,8 +1405,24 @@
                             beat your best time.
                         </p>
                     </div>
+                    <div class="home-card" onclick="showPage('siglab')">
+                        <div class="icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M12 3a5 5 0 0 0-5 5c0 2.1 1.3 3.6 2.5 4.7.9.8 1.5 1.8 1.5 2.9V17h2v-1.4c0-1.1.6-2.1 1.5-2.9C15.7 11.6 17 10.1 17 8a5 5 0 0 0-5-5z"
+                                ></path>
+                                <path d="M9.5 20h5"></path>
+                                <path d="M10 17h4"></path>
+                                <path d="M10.3 8.2c.5-.8 1.4-1.2 2.3-1.2"></path>
+                            </svg>
+                        </div>
+                        <h3>Significance Lab</h3>
+                        <p>
+                            Write significance explanations from memory, then
+                            self-grade with the rubric.
+                        </p>
+                    </div>
                 </div>
-
                 <div class="stats-section">
                     <div
                         class="stats-collapse-header"
@@ -1469,6 +1553,11 @@
                 <div id="speed-wrapper"></div>
             </div>
 
+            <div class="page" id="page-siglab">
+                <h2 class="page-title">Significance Lab</h2>
+                <div id="siglab-wrapper"></div>
+            </div>
+
             <div
                 class="modal-overlay"
                 id="modal-overlay"
@@ -1547,6 +1636,7 @@
                 "flashcards",
                 "timeline",
                 "match",
+                "siglab",
             ];
             function showPage(name) {
                 pages.forEach((p) =>
@@ -1560,6 +1650,7 @@
                 if (name === "flashcards") initFlashcards();
                 if (name === "timeline") initTimeline();
                 if (name === "match") initMatch();
+                if (name === "siglab") initSigLab();
             }
 
             // ─── COLLAPSIBLES ────────────────────────────────────
@@ -1585,12 +1676,17 @@
                         q.answers.find((a) => a.label === "Era:")?.correct ||
                         "",
                     sig:
+                        q.significanceLong ||
                         q.answers.find((a) => a.label === "Significance:")
-                            ?.correct || "",
+                            ?.correct ||
+                        "",
                     sigShort:
+                        q.significanceShort ||
                         q.answers.find(
                             (a) => a.label === "Significance (Short):",
                         )?.correct ||
+                        q.answers.find((a) => a.label === "Significance:")
+                            ?.correct ||
                         `Influential ${q.answers.find((a) => a.label === "Era:")?.correct || "European"} work with broad cultural impact.`,
                 }));
             }
@@ -2688,6 +2784,143 @@
       <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap">
         <button class="btn" onclick="startSpeed(${total})">Play Again</button>
         <button class="btn outline" onclick="initSpeed()">Change Count</button>
+      </div>
+    </div>
+  `;
+            }
+
+            // ─── SIGNIFICANCE LAB ─────────────────────────────────
+            let sigLabState = null;
+
+            function initSigLab() {
+                sigLabState = null;
+                document.getElementById("siglab-wrapper").innerHTML = `
+    <div class="siglab-setup">
+      <h3 style="margin-bottom:8px">Manual Significance Quiz</h3>
+      <p>Type a significance response, use the rubric, and then self-grade with <strong>0, 1, or 2</strong> points per artwork.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" onclick="startSigLab(6)">Start 6 Works</button>
+        <button class="btn outline" onclick="startSigLab(10)">Start 10 Works</button>
+      </div>
+    </div>
+  `;
+            }
+
+            function buildSigLabRound(question) {
+                return { question, answer: "", grade: null, submitted: false };
+            }
+
+            function startSigLab(n) {
+                const questions = [...quizData]
+                    .sort(() => Math.random() - 0.5)
+                    .slice(0, n)
+                    .map(buildSigLabRound);
+                sigLabState = {
+                    rounds: questions,
+                    index: 0,
+                    startTime: Date.now(),
+                };
+                renderSigLab();
+            }
+
+            function renderSigLab() {
+                if (!sigLabState) return initSigLab();
+                const { rounds, index } = sigLabState;
+                if (index >= rounds.length) return finishSigLab();
+                const round = rounds[index];
+                const title =
+                    round.question.answers.find((a) => a.label === "Name:")
+                        ?.correct || "Unknown work";
+                const artist =
+                    round.question.answers.find((a) => a.label === "Artist:")
+                        ?.correct || "";
+                const era =
+                    round.question.answers.find((a) => a.label === "Era:")
+                        ?.correct || "";
+                const sampleResponse =
+                    round.question.significanceLong ||
+                    round.question.answers.find(
+                        (a) => a.label === "Significance:",
+                    )?.correct ||
+                    "No significance rubric available.";
+
+                document.getElementById("siglab-wrapper").innerHTML = `
+    <div class="siglab-card">
+      <div class="siglab-counter">${index + 1}/${rounds.length}</div>
+      <div class="siglab-event">${title}</div>
+      <div class="siglab-meta">${artist}${artist && era ? " · " : ""}${era} · Write your significance, then submit to reveal the full significance rubric.</div>
+      <label style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.8px">Your significance answer</label>
+      <textarea class="siglab-input" placeholder="Explain why this artwork matters..." onchange="setSigLabAnswer(this.value)" oninput="setSigLabAnswer(this.value)" ${round.submitted ? "disabled" : ""}>${round.answer || ""}</textarea>
+      ${
+          round.submitted
+              ? `
+      <div class="siglab-rubric">
+        <strong>Sample response:</strong><br>
+        ${sampleResponse}
+      </div>`
+              : ""
+      }
+      <div class="siglab-grade-grid">
+        ${[0, 1, 2].map((score) => `<button class="siglab-grade-btn${round.grade === score ? " selected" : ""}" onclick="setSigLabGrade(${score})" ${!round.submitted ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ""}>${score} / 2</button>`).join("")}
+      </div>
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+        <button id="siglab-submit-btn" class="btn" onclick="submitSigLabAnswer()" ${round.submitted || !round.answer.trim() ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ""}>Submit Answer</button>
+        <button class="btn outline" onclick="nextSigLabRound()" ${!round.submitted || round.grade === null ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ""}>Next</button>
+      </div>
+    </div>
+  `;
+            }
+
+            function setSigLabAnswer(text) {
+                const round = sigLabState.rounds[sigLabState.index];
+                round.answer = text;
+                const submitBtn = document.getElementById("siglab-submit-btn");
+                if (!submitBtn || round.submitted) return;
+                submitBtn.disabled = !round.answer.trim();
+                submitBtn.style.opacity = submitBtn.disabled ? "0.5" : "";
+                submitBtn.style.cursor = submitBtn.disabled
+                    ? "not-allowed"
+                    : "";
+            }
+
+            function setSigLabGrade(score) {
+                const round = sigLabState.rounds[sigLabState.index];
+                if (!round.submitted) return;
+                round.grade = score;
+                renderSigLab();
+            }
+
+            function submitSigLabAnswer() {
+                const round = sigLabState.rounds[sigLabState.index];
+                if (round.submitted || !round.answer.trim()) return;
+                round.submitted = true;
+                renderSigLab();
+            }
+
+            function nextSigLabRound() {
+                const round = sigLabState.rounds[sigLabState.index];
+                if (round.grade === null) return;
+                sigLabState.index++;
+                renderSigLab();
+            }
+
+            function finishSigLab() {
+                const { rounds, startTime } = sigLabState;
+                const elapsed = Date.now() - startTime;
+                const totalPoints = rounds.reduce(
+                    (sum, r) => sum + (r.grade ?? 0),
+                    0,
+                );
+                const maxPoints = rounds.length * 2;
+                const pct = Math.round((totalPoints / maxPoints) * 100);
+                saveQuizResult(pct, totalPoints, maxPoints, elapsed);
+                document.getElementById("siglab-wrapper").innerHTML = `
+    <div class="siglab-score">
+      <h3 style="margin-bottom:8px">Manual Grading Complete</h3>
+      <p>${totalPoints}/${maxPoints} points · ${fmtMs(elapsed)}</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" onclick="startSigLab(${rounds.length})">Play Again</button>
+        <button class="btn outline" onclick="initSigLab()">Change Length</button>
       </div>
     </div>
   `;
