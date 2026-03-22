@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Sponsors | StudySets</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Monda:wght@400;700&display=swap"
+            rel="stylesheet"
+        />
+        <link href="/assets/colors.css" rel="stylesheet" />
+        <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+        <style>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                font-family: "Monda", sans-serif;
+                background: var(--bg);
+                color: var(--text);
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+            nav {
+                background: var(--bg2);
+                border-bottom: 1px solid var(--border);
+                padding: 0 24px;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                height: 56px;
+            }
+            nav .nav-link {
+                text-decoration: none;
+                color: var(--text-dim);
+                font-family: "Monda", sans-serif;
+                font-size: 13px;
+                padding: 8px 14px;
+                border-radius: 8px;
+                transition: all 0.15s;
+            }
+            nav .nav-link:hover {
+                color: var(--text);
+                background: var(--bg3);
+            }
+            nav .nav-link.active {
+                color: var(--accent);
+                background: var(--accent-dim);
+            }
+            main {
+                max-width: 980px;
+                margin: 0 auto;
+                padding: 42px 24px;
+                width: 100%;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+            h1 {
+                font-size: 30px;
+            }
+            p,
+            a {
+                color: var(--text-dim);
+            }
+            a:hover {
+                color: var(--accent);
+            }
+            iframe {
+                width: 100%;
+                min-height: 70vh;
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                background: var(--bg2);
+            }
+        </style>
+    </head>
+    <body>
+        <nav>
+            <a class="nav-link" href="/index.html">Home</a>
+            <a class="nav-link" href="/donation/index.html">Donation</a>
+            <a class="nav-link active" href="/sponsors/index.html">Sponsors</a>
+        </nav>
+        <main>
+            <h1>Sponsors</h1>
+            <p>Download or view the sponsors PDF below.</p>
+            <a href="/assets/sponsors.pdf" download>Download sponsors PDF</a>
+            <iframe src="/assets/sponsors.pdf" title="Sponsors PDF"></iframe>
+        </main>
+    </body>
+</html>
