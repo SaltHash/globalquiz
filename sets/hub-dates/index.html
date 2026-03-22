@@ -262,6 +262,14 @@
 
   /* TIMELINE */
   .tl-list { display: grid; gap: 10px; }
+  .tl-controls {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
+  }
+  .tl-toggle {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-dim); cursor: pointer;
+  }
+  .tl-toggle input { accent-color: var(--purple); }
   .tl-item {
     background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 12px;
     cursor: pointer; transition: all 0.15s; display: grid; grid-template-columns: 78px 1fr; gap: 12px; align-items: start;
@@ -300,20 +308,27 @@
     padding: 22px;
   }
   .siglab-setup p, .siglab-score p { font-size: 12px; margin-bottom: 14px; color: var(--text-dim); }
-  .siglab-frag-grid { display: grid; gap: 10px; margin-top: 14px; }
-  .siglab-frag {
-    width: 100%; text-align: left; border: 1px solid var(--border); border-radius: 10px;
-    background: var(--bg3); color: var(--text); font-family: 'Monda', sans-serif;
-    font-size: 12px; padding: 11px 12px; cursor: pointer; transition: all 0.15s;
-  }
-  .siglab-frag:hover:not(:disabled) { border-color: var(--purple); }
-  .siglab-frag.selected { border-color: var(--purple); background: var(--purple-dim); }
-  .siglab-frag.correct { border-color: var(--green); background: rgba(74,222,128,0.12); }
-  .siglab-frag.wrong { border-color: var(--red); background: rgba(248,113,113,0.12); }
-  .siglab-frag:disabled { cursor: default; opacity: 0.9; }
   .siglab-counter { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; }
   .siglab-event { font-size: 18px; color: var(--purple); font-weight: 700; margin-bottom: 6px; }
   .siglab-meta { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; }
+  .siglab-rubric {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px; font-size: 12px; line-height: 1.55; color: var(--text-dim); margin: 12px 0;
+  }
+  .siglab-input {
+    width: 100%; min-height: 130px; resize: vertical;
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font-family: 'Monda', sans-serif; font-size: 12px; line-height: 1.5;
+    padding: 12px; outline: none; margin-top: 8px;
+  }
+  .siglab-input:focus { border-color: var(--purple); }
+  .siglab-grade-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .siglab-grade-btn {
+    border: 1px solid var(--border); border-radius: 10px; background: var(--bg3); color: var(--text);
+    font-family: 'Monda', sans-serif; font-size: 12px; padding: 10px 12px; cursor: pointer; transition: all 0.15s;
+  }
+  .siglab-grade-btn:hover { border-color: var(--purple); background: var(--purple-dim); }
+  .siglab-grade-btn.selected { border-color: var(--purple); background: var(--purple-dim); color: var(--purple); }
 
   /* MODAL */
   .modal-overlay {
@@ -331,7 +346,6 @@
   .modal-prompt { font-size: 16px; font-weight: 700; color: var(--purple); margin-bottom: 14px; }
   .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
   .modal-meta { font-size: 13px; color: var(--text-dim); margin-bottom: 12px; }
-  .modal-era { display: inline-block; font-size: 11px; background: var(--purple-dim); color: var(--purple); padding: 4px 12px; border-radius: 99px; margin-bottom: 12px; }
   .modal-sig { font-size: 13px; color: var(--text); line-height: 1.7; background: var(--bg3); border-radius: 10px; padding: 14px 16px; }
   .modal-close { position: absolute; top: 16px; right: 16px; background: var(--bg3); border: 1px solid var(--border); color: var(--text-dim); border-radius: 8px; padding: 6px 12px; font-family: 'Monda', sans-serif; font-size: 12px; cursor: pointer; }
   ::-webkit-scrollbar { width: 6px; }
@@ -342,10 +356,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-
+    padding: 32px;
     color: var(--text-dim);
     margin-top: auto;
-    min-height: 100px;
     background: var(--bg2);
     border-top: 1px solid var(--border);
   }
@@ -461,7 +474,6 @@
     <div class="modal">
       <button class="modal-close" onclick="closeModal()"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg><span>Close</span></button>
       <div id="modal-prompt" class="modal-prompt"></div>
-      <div id="modal-era" class="modal-era"></div>
       <div id="modal-title" class="modal-title"></div>
       <div id="modal-meta" class="modal-meta"></div>
       <div id="modal-sig" class="modal-sig"></div>
@@ -529,6 +541,7 @@ function buildCards() {
   }));
 }
 const CARDS = buildCards();
+let timelineDetailed = false;
 
 // ─── HOME STATS ──────────────────────────────────────
 function renderHomeStats() {
@@ -1086,16 +1099,28 @@ function initTimeline(){
   const w=document.getElementById('timeline-wrapper');
   const cards=[...CARDS].sort((a,b)=>parseInt(a.artist,10)-parseInt(b.artist,10));
 
-  w.innerHTML=`<div class="tl-list">${cards.map(c=>{
+  w.innerHTML=`
+    <div class="tl-controls">
+      <label class="tl-toggle">
+        <input type="checkbox" ${timelineDetailed ? 'checked' : ''} onchange="setTimelineDetailed(this.checked)">
+        <span>Detailed significances</span>
+      </label>
+    </div>
+    <div class="tl-list">${cards.map(c=>{
     const cardIndex = CARDS.indexOf(c);
     return `<div class="tl-item" onclick="openModalByIndex(${cardIndex})">
       <div class="tl-item-date">${getDateStr(c)}</div>
       <div>
         <div class="tl-item-title">${c.name}</div>
-        <div class="tl-item-sig">${c.sigShort}</div>
+        <div class="tl-item-sig">${timelineDetailed ? c.sig : c.sigShort}</div>
       </div>
     </div>`;
   }).join('')}</div>`;
+}
+
+function setTimelineDetailed(enabled){
+  timelineDetailed = enabled;
+  initTimeline();
 }
 
 // ─── MODAL ───────────────────────────────────────────
@@ -1107,8 +1132,7 @@ function openModal(card){
   if(!card)return;
   document.getElementById('modal-prompt').textContent=card.prompt || `${card.artist} — ${card.name}`;
   document.getElementById('modal-title').textContent=card.name;
-  document.getElementById('modal-meta').textContent=card.era;
-  document.getElementById('modal-era').style.display='none';
+  document.getElementById('modal-meta').textContent=`${card.artist}`;
   document.getElementById('modal-sig').textContent=card.sig;
   document.getElementById('modal-overlay').classList.add('open');
 }
@@ -1300,8 +1324,8 @@ function initSigLab(){
   document.getElementById('siglab-wrapper').innerHTML = `
     <div class="siglab-setup">
       <div class="hero-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3a3 3 0 0 0-3 3v1a3 3 0 0 0-2 2.8A3 3 0 0 0 6 13v1a3 3 0 0 0 3 3"></path><path d="M15 3a3 3 0 0 1 3 3v1a3 3 0 0 1 2 2.8A3 3 0 0 1 18 13v1a3 3 0 0 1-3 3"></path><path d="M12 3v18"></path><path d="M9 7h6M9 12h6M9 17h6"></path></svg></div>
-      <h3 style="margin-bottom:8px">Causal Chain Lab</h3>
-      <p>This mode is built specifically for significance study. For each event, pick the <strong>three fragments</strong> that form the best historical impact chain (cause, shift, and legacy).</p>
+      <h3 style="margin-bottom:8px">Manual Significance Quiz</h3>
+      <p>Type a significance response, use the rubric, and then self-grade with <strong>0, 1, or 2</strong> points per event.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn" onclick="startSigLab(6)">Start 6 Events</button>
         <button class="btn outline" onclick="startSigLab(10)">Start 10 Events</button>
@@ -1311,21 +1335,12 @@ function initSigLab(){
 }
 
 function buildSigLabRound(question){
-  const chain = [...(question.significanceChain || [question.significanceShort])].slice(0,3);
-  while(chain.length < 3) chain.push(question.significanceShort);
-  const distractors = [...quizData]
-    .filter(q => q !== question)
-    .sort(()=>Math.random()-0.5)
-    .slice(0,3)
-    .map(q => (q.significanceChain && q.significanceChain[0]) || q.significanceShort)
-    .map(t => t.length > 115 ? t.slice(0,112) + '...' : t);
-  const fragments = [...chain, ...distractors].sort(()=>Math.random()-0.5);
-  return { question, chain, fragments, picks: [], checked: false, correct: false };
+  return { question, answer: '', grade: null };
 }
 
 function startSigLab(n){
   const questions = [...quizData].sort(()=>Math.random()-0.5).slice(0,n).map(buildSigLabRound);
-  sigLabState = { rounds: questions, index: 0, correct: 0, startTime: Date.now() };
+  sigLabState = { rounds: questions, index: 0, startTime: Date.now() };
   renderSigLab();
 }
 
@@ -1341,64 +1356,55 @@ function renderSigLab(){
     <div class="siglab-card">
       <div class="siglab-counter">${index+1}/${rounds.length}</div>
       <div class="siglab-event">${event}</div>
-      <div class="siglab-meta">${year} · Pick 3 fragments in impact order.</div>
-      <div class="siglab-frag-grid">
-        ${round.fragments.map((frag, i)=>`<button class="siglab-frag${round.picks.includes(i)?' selected':''}" onclick="toggleSigFrag(${i})" ${round.checked?'disabled':''}>${frag}</button>`).join('')}
+      <div class="siglab-meta">${year} · Write a concise significance explanation.</div>
+      <div class="siglab-rubric">
+        <strong>Rubric (2 points total)</strong><br>
+        <strong>2/2:</strong> clear historical impact + broader consequence.<br>
+        <strong>1/2:</strong> partially correct impact but missing depth/scope.<br>
+        <strong>0/2:</strong> vague, inaccurate, or mostly restates the event.
+      </div>
+      <label style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.8px">Your significance answer</label>
+      <textarea class="siglab-input" placeholder="Explain why this event matters..." onchange="setSigLabAnswer(this.value)" oninput="setSigLabAnswer(this.value)">${round.answer || ''}</textarea>
+      <div class="siglab-grade-grid">
+        ${[0,1,2].map(score=>`<button class="siglab-grade-btn${round.grade===score?' selected':''}" onclick="setSigLabGrade(${score})">${score} / 2</button>`).join('')}
       </div>
       <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn" onclick="checkSigLabRound()" ${round.picks.length!==3 || round.checked ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Check Chain</button>
-        <button class="btn outline" onclick="nextSigLabRound()" ${!round.checked ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Next</button>
+        <button class="btn outline" onclick="nextSigLabRound()" ${round.grade===null ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Next</button>
       </div>
     </div>
   `;
-
-  if(round.checked) {
-    const buttons = [...document.querySelectorAll('.siglab-frag')];
-    buttons.forEach((btn, i) => {
-      const isChosen = round.picks.includes(i);
-      const shouldBe = round.chain.includes(round.fragments[i]);
-      if(shouldBe) btn.classList.add('correct');
-      if(isChosen && !shouldBe) btn.classList.add('wrong');
-    });
-  }
 }
 
-function toggleSigFrag(i){
+function setSigLabAnswer(text){
   const round = sigLabState.rounds[sigLabState.index];
-  if(round.checked) return;
-  if(round.picks.includes(i)) round.picks = round.picks.filter(x=>x!==i);
-  else if(round.picks.length < 3) round.picks.push(i);
-  renderSigLab();
+  round.answer = text;
 }
 
-function checkSigLabRound(){
+function setSigLabGrade(score){
   const round = sigLabState.rounds[sigLabState.index];
-  if(round.checked || round.picks.length!==3) return;
-  const pickedTexts = round.picks.map(i=>round.fragments[i]);
-  const isCorrect = pickedTexts.every((t,i)=>t===round.chain[i]);
-  round.checked = true;
-  round.correct = isCorrect;
-  if(isCorrect) sigLabState.correct++;
+  round.grade = score;
   renderSigLab();
 }
 
 function nextSigLabRound(){
   const round = sigLabState.rounds[sigLabState.index];
-  if(!round.checked) return;
+  if(round.grade===null) return;
   sigLabState.index++;
   renderSigLab();
 }
 
 function finishSigLab(){
-  const { rounds, correct, startTime } = sigLabState;
+  const { rounds, startTime } = sigLabState;
   const elapsed = Date.now() - startTime;
-  const pct = Math.round((correct/rounds.length)*100);
-  saveQuizResult(pct, correct, rounds.length, elapsed);
+  const totalPoints = rounds.reduce((sum, r)=>sum + (r.grade ?? 0), 0);
+  const maxPoints = rounds.length * 2;
+  const pct = Math.round((totalPoints / maxPoints) * 100);
+  saveQuizResult(pct, totalPoints, maxPoints, elapsed);
   document.getElementById('siglab-wrapper').innerHTML = `
     <div class="siglab-score">
       <div class="hero-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3a3 3 0 0 0-3 3v1a3 3 0 0 0-2 2.8A3 3 0 0 0 6 13v1a3 3 0 0 0 3 3"></path><path d="M15 3a3 3 0 0 1 3 3v1a3 3 0 0 1 2 2.8A3 3 0 0 1 18 13v1a3 3 0 0 1-3 3"></path><path d="M12 3v18"></path><path d="M9 7h6M9 12h6M9 17h6"></path></svg></div>
-      <h3 style="margin-bottom:8px">Causal Chain Complete</h3>
-      <p>${correct}/${rounds.length} chains in correct order · ${fmtMs(elapsed)}</p>
+      <h3 style="margin-bottom:8px">Manual Grading Complete</h3>
+      <p>${totalPoints}/${maxPoints} points · ${fmtMs(elapsed)}</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn" onclick="startSigLab(${rounds.length})">Play Again</button>
         <button class="btn outline" onclick="initSigLab()">Change Length</button>
