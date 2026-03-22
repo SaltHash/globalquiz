@@ -1960,7 +1960,7 @@
                     return;
                 }
                 const q = questions[index];
-                const pct = (index / questions.length) * 100;
+                const pct = ((index + 1) / questions.length) * 100;
                 document.getElementById("quiz-mode-label").textContent =
                     `${index + 1} / ${questions.length}`;
                 w.innerHTML = `
