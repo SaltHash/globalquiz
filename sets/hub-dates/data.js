@@ -10,38 +10,12 @@ function buildSignificanceChain(item) {
   return chain.map(c => c[0]?.toUpperCase() + c.slice(1));
 }
 
-function removeEventNameParts(text, eventName) {
-  if(!text) return '';
-  const stopWords = new Set(['of','the','and','in','on','to','for','a','an','by','with','from','at']);
-  const eventWords = (eventName || '')
-    .toLowerCase()
-    .replace(/[^\w\s’']/g, ' ')
-    .split(/\s+/)
-    .filter(w => w.length > 2 && !stopWords.has(w));
-  if(!eventWords.length) return text;
-
-  let output = text;
-  eventWords.forEach(word => {
-    const pattern = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
-    output = output.replace(pattern, '');
-  });
-  return output
-    .replace(/\s{2,}/g, ' ')
-    .replace(/\s+([.,;:!?])/g, '$1')
-    .trim();
-}
-
-function sanitizeSignificance(text, eventName) {
-  const withoutDates = (text || '').replace(/\b\d{3,4}\b/g, '').trim();
-  return removeEventNameParts(withoutDates, eventName);
-}
-
 const quizData = [
   {
     year: "1350",
     event: "Bubonic Plague",
     era: "Renaissance",
-    significanceLong: "The plague shattered demographic and labor patterns, forcing elites and institutions to renegotiate how work and authority functioned. By destabilizing older social arrangements, it widened space for new economic habits and cultural priorities across Europe.",
+    significanceLong: "A catastrophic demographic shock shattered labor patterns, forcing elites and institutions to renegotiate how work and authority functioned. By destabilizing older social arrangements, it widened space for new economic habits and cultural priorities.",
     significanceShort: "Demographic collapse pushed long-term social and economic restructuring.",
     significanceOptions: [
       "Demographic collapse pushed long-term social and economic restructuring.",
@@ -65,10 +39,10 @@ const quizData = [
     year: "1487",
     event: "Dias rounded the Cape of Good Hope",
     era: "Renaissance",
-    significanceLong: "Rounding the Cape demonstrated a workable maritime corridor linking Atlantic and Indian Ocean trade systems. That route encouraged new imperial and commercial strategies that reoriented European power toward long-distance sea exchange.",
-    significanceShort: "A viable Cape route redirected trade and imperial strategy.",
+    significanceLong: "The voyage demonstrated a workable maritime corridor linking Atlantic and Indian Ocean trade systems. That route encouraged new imperial and commercial strategies that reoriented power toward long-distance sea exchange.",
+    significanceShort: "A viable ocean route redirected trade and imperial strategy.",
     significanceOptions: [
-      "A viable Cape route redirected trade and imperial strategy.",
+      "A viable ocean route redirected trade and imperial strategy.",
       "The voyage mainly settled inland border disputes in southern Africa.",
       "It proved overland caravans remained the dominant path for global trade."
     ]
@@ -77,10 +51,10 @@ const quizData = [
     year: "1517",
     event: "Luther’s 95 Theses",
     era: "Reformation",
-    significanceLong: "Luther’s challenge accelerated fractures in religious authority by making doctrinal conflict politically unavoidable for rulers and communities. The resulting disputes reshaped institutions, education, and confessional identity across generations.",
-    significanceShort: "It triggered confessional conflict that reworked authority in Europe.",
+    significanceLong: "A major doctrinal challenge accelerated fractures in religious authority by making conflict politically unavoidable for rulers and communities. The resulting disputes reshaped institutions, education, and confessional identity across generations.",
+    significanceShort: "It triggered confessional conflict that reworked authority across states.",
     significanceOptions: [
-      "It triggered confessional conflict that reworked authority in Europe.",
+      "It triggered confessional conflict that reworked authority across states.",
       "It was a local clerical complaint resolved quickly inside existing church structures.",
       "It mainly changed monastic architecture without wider political effects."
     ]
@@ -93,7 +67,7 @@ const quizData = [
     significanceShort: "It strengthened sovereign-state diplomacy after religious wars.",
     significanceOptions: [
       "It strengthened sovereign-state diplomacy after religious wars.",
-      "It restored a unified religious hierarchy as Europe’s central political referee.",
+      "It restored a unified religious hierarchy as the central political referee.",
       "It had little effect beyond ceremonial court protocol."
     ]
   },
@@ -101,7 +75,7 @@ const quizData = [
     year: "1687",
     event: "Principia",
     era: "Scientific Revolution",
-    significanceLong: "Newton’s synthesis gave scholars a shared mathematical language for describing motion and force across different phenomena. This credibility for predictive, law-based inquiry deeply influenced scientific institutions and Enlightenment confidence in reason.",
+    significanceLong: "A landmark synthesis gave scholars a shared mathematical language for describing motion and force across different phenomena. This credibility for predictive, law-based inquiry deeply influenced scientific institutions and Enlightenment confidence in reason.",
     significanceShort: "It established predictive physical laws with broad intellectual authority.",
     significanceOptions: [
       "It established predictive physical laws with broad intellectual authority.",
@@ -113,7 +87,7 @@ const quizData = [
     year: "1688",
     event: "Glorious Revolution",
     era: "State Building",
-    significanceLong: "The revolution reset the English crown’s legitimacy around legal limits and parliamentary consent rather than inherited absolutism alone. Its settlement influenced later debates on rights, representation, and constitutional governance in and beyond Britain.",
+    significanceLong: "This political upheaval reset the English crown’s legitimacy around legal limits and parliamentary consent rather than inherited absolutism alone. Its settlement influenced later debates on rights, representation, and constitutional governance in and beyond Britain.",
     significanceShort: "It tied monarchy more tightly to parliamentary constitutional limits.",
     significanceOptions: [
       "It tied monarchy more tightly to parliamentary constitutional limits.",
@@ -149,10 +123,10 @@ const quizData = [
     year: "1815",
     event: "Congress of Vienna",
     era: "French Revolution and Napoleon",
-    significanceLong: "The congress built a conservative diplomatic order meant to contain revolutionary spillover through consultation and balance. Its framework shaped nineteenth-century crisis management even as nationalist pressures kept testing the settlement.",
-    significanceShort: "It organized a balance-of-power order to manage post-Napoleonic Europe.",
+    significanceLong: "The diplomatic settlement built a conservative order meant to contain revolutionary spillover through consultation and balance. Its framework shaped nineteenth-century crisis management even as nationalist pressures kept testing the settlement.",
+    significanceShort: "It organized a balance-of-power order to manage the postwar continent.",
     significanceOptions: [
-      "It organized a balance-of-power order to manage post-Napoleonic Europe.",
+      "It organized a balance-of-power order to manage the postwar continent.",
       "It abolished diplomacy in favor of unilateral imperial annexation.",
       "It prioritized immediate democratic federation across all major states."
     ]
@@ -161,7 +135,7 @@ const quizData = [
     year: "1832",
     event: "Great Reform Bill",
     era: "Liberal Revolutions and Unification",
-    significanceLong: "The bill widened representation and reduced some structural distortions in Britain’s electoral system. Although limited, it legitimized incremental parliamentary reform as a pathway for adapting political order.",
+    significanceLong: "This law widened representation and reduced some structural distortions in Britain’s electoral system. Although limited, it legitimized incremental parliamentary reform as a pathway for adapting political order.",
     significanceShort: "It expanded representation and normalized gradual parliamentary reform.",
     significanceOptions: [
       "It expanded representation and normalized gradual parliamentary reform.",
@@ -173,11 +147,11 @@ const quizData = [
     year: "1848",
     event: "Year of Revolution",
     era: "Liberal Revolutions and Unification",
-    significanceLong: "Across Europe, uprisings exposed the scale of liberal and nationalist demands even where governments reasserted control. The failures still left organizational experience and ideological momentum that shaped later state-building.",
+    significanceLong: "Across the continent, uprisings exposed the scale of liberal and nationalist demands even where governments reasserted control. The failures still left organizational experience and ideological momentum that shaped later state-building.",
     significanceShort: "Failed uprisings still advanced liberal and nationalist momentum.",
     significanceOptions: [
       "Failed uprisings still advanced liberal and nationalist momentum.",
-      "The revolts produced a stable pan-European republic within a year.",
+      "The revolts produced a stable continental republic within a year.",
       "They were isolated peasant riots with no ideological continuity."
     ]
   },
@@ -185,11 +159,11 @@ const quizData = [
     year: "1871",
     event: "Unification of Germany",
     era: "Liberal Revolutions and Unification",
-    significanceLong: "German unification created a large industrial state at Europe’s center under Prussian-led institutions and military prestige. Its emergence altered alliance logic, competition, and strategic calculations for decades.",
-    significanceShort: "A powerful unified Germany transformed Europe’s strategic balance.",
+    significanceLong: "Political consolidation created a large industrial state at the continent’s center under militarized institutions and prestige. Its emergence altered alliance logic, competition, and strategic calculations for decades.",
+    significanceShort: "A powerful newly unified state transformed the strategic balance.",
     significanceOptions: [
-      "A powerful unified Germany transformed Europe’s strategic balance.",
-      "It dissolved central authority and fragmented German lands further.",
+      "A powerful newly unified state transformed the strategic balance.",
+      "It dissolved central authority and fragmented regional territories further.",
       "It remained culturally symbolic with negligible diplomatic impact."
     ]
   },
@@ -209,10 +183,10 @@ const quizData = [
     year: "1919",
     event: "Treaty of Versailles",
     era: "Interwar and World War II",
-    significanceLong: "Versailles imposed punitive and territorial terms while attempting to institutionalize a new international order. The settlement’s contradictions fed revisionism, grievance politics, and unstable interwar diplomacy.",
-    significanceShort: "Punitive peace terms deepened instability in interwar Europe.",
+    significanceLong: "A punitive peace settlement imposed territorial terms while attempting to institutionalize a new international order. The settlement’s contradictions fed revisionism, grievance politics, and unstable interwar diplomacy.",
+    significanceShort: "Punitive peace terms deepened instability in the interwar period.",
     significanceOptions: [
-      "Punitive peace terms deepened instability in interwar Europe.",
+      "Punitive peace terms deepened instability in the interwar period.",
       "It produced broad reconciliation that removed major geopolitical grievances.",
       "It had no role in shaping interwar political radicalization."
     ]
@@ -221,11 +195,11 @@ const quizData = [
     year: "1945",
     event: "Yalta Conference",
     era: "Interwar and World War II",
-    significanceLong: "Yalta coordinated immediate postwar arrangements while exposing differing visions for Europe’s political future. Those unresolved tensions hardened into competing blocs and institutions during the early Cold War.",
-    significanceShort: "Postwar planning at Yalta foreshadowed Cold War bloc division.",
+    significanceLong: "A major wartime summit coordinated immediate postwar arrangements while exposing differing visions for the continent’s political future. Those unresolved tensions hardened into competing blocs and institutions during the early Cold War.",
+    significanceShort: "Postwar planning there foreshadowed Cold War bloc division.",
     significanceOptions: [
-      "Postwar planning at Yalta foreshadowed Cold War bloc division.",
-      "It created a unified European military under shared command.",
+      "Postwar planning there foreshadowed Cold War bloc division.",
+      "It created a unified continental military under shared command.",
       "It ended superpower rivalry by agreeing on permanent neutrality."
     ]
   },
@@ -233,11 +207,11 @@ const quizData = [
     year: "1968",
     event: "Prague Spring",
     era: "Cold War",
-    significanceLong: "Reform efforts in Czechoslovakia revealed both popular demand for liberalization and strict limits of Soviet tolerance. The crackdown became a reference point for dissent, legitimacy debates, and later resistance movements.",
+    significanceLong: "Reform efforts in one Eastern Bloc state revealed both popular demand for liberalization and strict limits of superpower tolerance. The crackdown became a reference point for dissent, legitimacy debates, and later resistance movements.",
     significanceShort: "Its suppression exposed limits of reform inside the Soviet bloc.",
     significanceOptions: [
       "Its suppression exposed limits of reform inside the Soviet bloc.",
-      "It permanently liberalized Eastern Europe under Soviet endorsement.",
+      "It permanently liberalized the region under superpower endorsement.",
       "It was primarily an economic summit with no political implications."
     ]
   },
@@ -245,11 +219,11 @@ const quizData = [
     year: "1989",
     event: "Year of Revolution",
     era: "Cold War",
-    significanceLong: "Revolutions across Eastern Europe dismantled communist rule with remarkable speed and varying local paths. Together they accelerated systemic collapse in the Soviet sphere and reshaped Europe’s ideological map.",
-    significanceShort: "1989 toppled communist regimes and sped the Cold War’s end.",
+    significanceLong: "Revolutions across the region dismantled one-party rule with remarkable speed and varying local paths. Together they accelerated systemic collapse in a rival sphere and reshaped the ideological map.",
+    significanceShort: "These uprisings toppled one-party regimes and sped the Cold War’s end.",
     significanceOptions: [
-      "1989 toppled communist regimes and sped the Cold War’s end.",
-      "It strengthened one-party communist control through coordinated reforms.",
+      "These uprisings toppled one-party regimes and sped the Cold War’s end.",
+      "It strengthened one-party control through coordinated reforms.",
       "It marked cultural protest without major regime change."
     ]
   },
@@ -257,10 +231,10 @@ const quizData = [
     year: "1991",
     event: "Treaty of Maastricht",
     era: "Contemporary Europe",
-    significanceLong: "Maastricht deepened integration by expanding shared institutions, policy coordination, and plans for monetary union. It pushed European cooperation from loose coordination toward a more ambitious political project.",
-    significanceShort: "It moved Europe toward deeper institutional and monetary integration.",
+    significanceLong: "A foundational treaty deepened integration by expanding shared institutions, policy coordination, and plans for monetary union. It pushed regional cooperation from loose coordination toward a more ambitious political project.",
+    significanceShort: "It moved the region toward deeper institutional and monetary integration.",
     significanceOptions: [
-      "It moved Europe toward deeper institutional and monetary integration.",
+      "It moved the region toward deeper institutional and monetary integration.",
       "It dissolved shared institutions in favor of strict national isolation.",
       "It focused only on cultural exchange with no governance changes."
     ]
@@ -269,35 +243,31 @@ const quizData = [
     year: "1993",
     event: "European Union Formed",
     era: "Contemporary Europe",
-    significanceLong: "The EU’s launch consolidated prior treaties into a stronger supranational framework with wider policy reach. This institutional shift altered how member states negotiated sovereignty, regulation, and collective identity.",
-    significanceShort: "EU formation institutionalized stronger supranational coordination across Europe.",
+    significanceLong: "A new supranational bloc consolidated prior treaties into a stronger framework with wider policy reach. This institutional shift altered how member states negotiated sovereignty, regulation, and collective identity.",
+    significanceShort: "Its formation institutionalized stronger supranational coordination across the region.",
     significanceOptions: [
-      "EU formation institutionalized stronger supranational coordination across Europe.",
+      "Its formation institutionalized stronger supranational coordination across the region.",
       "It replaced cooperation with a temporary bilateral trade pact only.",
       "It was mostly symbolic and left state coordination unchanged."
     ]
   }
 ].map((item) => {
-  const significanceLong = sanitizeSignificance(item.significanceLong, item.event);
-  const significanceShort = sanitizeSignificance(item.significanceShort, item.event);
-  const significanceOptions = (item.significanceOptions || []).map(option => sanitizeSignificance(option, item.event));
-  const cleanedItem = { ...item, significanceLong, significanceShort, significanceOptions };
   return ({
   type: 'text',
-  prompt: `${cleanedItem.year} — ${cleanedItem.event}`,
-  era: cleanedItem.era,
+  prompt: `${item.year} — ${item.event}`,
+  era: item.era,
   answers: [
-    { type: 'text-input', label: 'Event:', correct: cleanedItem.event },
-    { type: 'text-input', label: 'Year:', correct: cleanedItem.year },
+    { type: 'text-input', label: 'Event:', correct: item.event },
+    { type: 'text-input', label: 'Year:', correct: item.year },
     {
       type: 'text-mc',
       label: 'Significance:',
-      options: cleanedItem.significanceOptions,
-      correct: cleanedItem.significanceShort
+      options: item.significanceOptions,
+      correct: item.significanceShort
     }
   ],
-  significanceLong: cleanedItem.significanceLong,
-  significanceShort: cleanedItem.significanceShort,
-  significanceChain: cleanedItem.significanceChain || buildSignificanceChain(cleanedItem)
+  significanceLong: item.significanceLong,
+  significanceShort: item.significanceShort,
+  significanceChain: item.significanceChain || buildSignificanceChain(item)
   });
 });
