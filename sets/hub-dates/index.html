@@ -1368,7 +1368,7 @@ function renderSigLab(){
         ${[0,1,2].map(score=>`<button class="siglab-grade-btn${round.grade===score?' selected':''}" onclick="setSigLabGrade(${score})" ${!round.submitted ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${score} / 2</button>`).join('')}
       </div>
       <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn" onclick="submitSigLabAnswer()" ${round.submitted || !round.answer.trim() ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Submit Answer</button>
+        <button id="siglab-submit-btn" class="btn" onclick="submitSigLabAnswer()" ${round.submitted || !round.answer.trim() ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Submit Answer</button>
         <button class="btn outline" onclick="nextSigLabRound()" ${!round.submitted || round.grade===null ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Next</button>
       </div>
     </div>
@@ -1378,6 +1378,11 @@ function renderSigLab(){
 function setSigLabAnswer(text){
   const round = sigLabState.rounds[sigLabState.index];
   round.answer = text;
+  const submitBtn = document.getElementById('siglab-submit-btn');
+  if(!submitBtn || round.submitted) return;
+  submitBtn.disabled = !round.answer.trim();
+  submitBtn.style.opacity = submitBtn.disabled ? '0.5' : '';
+  submitBtn.style.cursor = submitBtn.disabled ? 'not-allowed' : '';
 }
 
 function setSigLabGrade(score){
