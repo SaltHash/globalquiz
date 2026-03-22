@@ -296,6 +296,5 @@ const quizData = [
     ],
     significanceLong: item.significanceLong,
     significanceShort: item.significanceShort,
-    significanceChain: item.significanceChain || buildSignificanceChain(item),
   };
 });
