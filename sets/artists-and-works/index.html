@@ -585,13 +585,49 @@
                 border-color: var(--accent);
                 color: var(--text);
             }
-            .quiz-part-chip input {
-                accent-color: var(--accent);
+            .quiz-part-chip input[type="checkbox"] {
+                appearance: none;
+                -webkit-appearance: none;
+
+                width: 16px;
+                height: 16px;
+                border: 2px solid var(--border);
+                border-radius: 4px;
+
+                background: var(--bg3);
+                cursor: pointer;
+                position: relative;
+            }
+
+            .quiz-part-chip input[type="checkbox"]:checked {
+                background: var(--accent);
+                border-color: var(--accent);
+            }
+
+            .quiz-part-chip input[type="checkbox"]:checked::after {
+                content: "";
+                position: absolute;
+
+                top: 50%;
+                left: 50%;
+
+                width: 5px;
+                height: 9px;
+
+                border: solid var(--text);
+                border-width: 0 2px 2px 0;
+
+                transform: translate(-50%, -65%) rotate(45deg);
             }
             .quiz-part-note {
                 font-size: 11px;
                 color: var(--text-dim);
                 margin-bottom: 18px;
+            }
+            .quiz-part-warn {
+                font-size: 11px;
+                color: var(--yellow);
+                margin-top: 8px;
             }
             .quiz-progress {
                 display: flex;
@@ -1794,6 +1830,15 @@
             ];
             let selectedQuizParts = new Set(QUIZ_PARTS.map((p) => p.key));
 
+            function renderQuizPartWarning() {
+                const warn = document.getElementById("quiz-part-warn");
+                if (!warn) return;
+                warn.textContent =
+                    selectedQuizParts.size < 1
+                        ? "Select at least one quiz part so each question can ask for a detail."
+                        : "";
+            }
+
             function initQuizSetup() {
                 document.getElementById("quiz-mode-label").textContent = "";
                 const total = quizData.length;
@@ -1827,6 +1872,7 @@
         ).join("")}
       </div>
       <div class="quiz-part-note">Use the provided prompt to fill in what you know.</div>
+      <div id="quiz-part-warn" class="quiz-part-warn"></div>
       <p style="margin-bottom:10px;font-size:13px;color:var(--text-dim)">How many questions?</p>
       <div class="quiz-count-grid" id="quiz-count-grid">
         ${opts.map((n) => `<button class="quiz-count-btn${n === quizCount ? " active" : ""}" onclick="setQuizCount(${n},this)">${n === total ? "All (" + total + ")" : n}</button>`).join("")}
@@ -1838,6 +1884,7 @@
                 if (quizMode === "wrong")
                     document.getElementById("quiz-count-grid").style.display =
                         "none";
+                renderQuizPartWarning();
             }
 
             function setQuizMode(mode, btn) {
@@ -1861,18 +1908,15 @@
 
             function toggleQuizPart(partKey, enabled) {
                 if (enabled) selectedQuizParts.add(partKey);
-                else if (selectedQuizParts.size > 1)
-                    selectedQuizParts.delete(partKey);
-                else {
-                    const cb = document.querySelector(
-                        `#quiz-part-grid input[data-part="${partKey}"]`,
-                    );
-                    if (cb) cb.checked = true;
-                    alert("Pick at least one quiz part.");
-                }
+                else selectedQuizParts.delete(partKey);
+                renderQuizPartWarning();
             }
 
             function startQuiz() {
+                if (selectedQuizParts.size < 1) {
+                    alert("Pick at least one quiz part before starting.");
+                    return;
+                }
                 let pool;
                 if (quizMode === "wrong") {
                     const wrongIds = LS.get("quiz_wrong_ids") || [];
