@@ -1,0 +1,18 @@
+:root {
+    --bg: rgb(30, 30, 29);
+    --bg2: rgb(39, 39, 38);
+    --bg3: rgb(47, 47, 46);
+
+    --border: rgb(65, 65, 63);
+    --accent: rgb(226, 126, 90);
+    --accent-dim: rgba(226, 126, 90, 0.18);
+
+    --text: rgb(240, 230, 225);
+    --text-dim: rgb(170, 158, 154);
+
+    --green: #4ade80;
+    --red: #f87171;
+    --yellow: #fbbf24;
+
+    --glass-blur: 0;
+}

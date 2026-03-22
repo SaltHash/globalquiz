@@ -1,73 +1,186 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GlobalQuiz</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Monda:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: rgb(15, 16, 18);
-      --bg2: rgb(22, 23, 27);
-      --bg3: rgb(30, 32, 37);
-      --border: rgb(45, 47, 55);
-      --accent: #ff9169;
-      --accent-dim: rgba(255, 145, 105, 0.15);
-      --text: #e8e9f0;
-      --text-dim: #7a7d8e;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Monda', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
-    nav {
-      background: var(--bg2); border-bottom: 1px solid var(--border);
-      padding: 0 24px; display: flex; align-items: center; gap: 4px;
-      height: 56px; position: sticky; top: 0; z-index: 100;
-    }
-    .logo { display:inline-flex; align-items:center; gap:8px; color: var(--accent); font-weight: 700; font-size: 15px; margin-right: 20px; letter-spacing: 0.5px; text-decoration:none; }
-    .logo-mark { width:16px; height:16px; line-height:1; display:inline-flex; align-items:center; justify-content:center; }
-    .logo-mark svg { width:16px; height:16px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
-    nav .nav-link {
-      text-decoration: none; color: var(--text-dim);
-      font-family: 'Monda', sans-serif; font-size: 13px; padding: 8px 14px;
-      border-radius: 8px; transition: all 0.15s;
-    }
-    nav .nav-link:hover { color: var(--text); background: var(--bg3); }
-    nav .nav-link.active { color: var(--accent); background: var(--accent-dim); }
-    main { max-width: 900px; margin: 0 auto; padding: 42px 24px; width: 100%; flex: 1; }
-    footer { display:flex; align-items:center; justify-content:center; padding:32px; color: var(--text-dim); background: var(--bg2); border-top: 1px solid var(--border); }
-    h1 { font-size: 30px; margin-bottom: 10px; }
-    p { color: var(--text-dim); margin-bottom: 28px; }
-    .set-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap: 16px; }
-    .set-card { display: block; text-decoration: none; color: inherit; padding: 22px; border-radius: 14px; background: var(--bg2); border: 1px solid var(--border); transition: .2s; }
-    .set-card:hover { transform: translateY(-2px); border-color: var(--accent); background: var(--bg3); }
-    .set-card h2 { font-size: 17px; margin-bottom: 8px; }
-    .set-card span { color: var(--accent); font-size: 13px; }
-    .set-card p { margin: 10px 0 0; font-size: 13px; }
-  </style>
-</head>
-<body>
-  <nav>
-    <a class="logo" href="index.html"><span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18"></path><path d="M12 3a15 15 0 0 1 0 18"></path><path d="M12 3a15 15 0 0 0 0 18"></path></svg></span><span>GlobalQuiz</span></a>
-    <a class="nav-link" href="sets/artists-and-works/index.html">Artists and Works</a>
-    <a class="nav-link" href="sets/hub-dates/index.html">HUB Dates</a>
-  </nav>
-  <main>
-    <h1>Select a study set</h1>
-    <p>Choose a set to practice with quizzes, speed rounds, flashcards, timeline browse, and matching mode.</p>
-    <div class="set-grid">
-      <a class="set-card" href="sets/artists-and-works/index.html">
-        <h2>Artists and Works</h2>
-        <span>AP Euro Art</span>
-        <p>Practice artwork titles, artists, eras, and significance.</p>
-      </a>
-      <a class="set-card" href="sets/hub-dates/index.html">
-        <h2>HUB Dates</h2>
-        <span>European History Milestones</span>
-        <p>Practice important events, dates, and historical significance.</p>
-      </a>
-    </div>
-  </main>
-  <footer>&copy; 2026 Bryce</footer>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>GlobalQuiz</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Monda:wght@400;700&display=swap"
+            rel="stylesheet"
+        />
+        <link href="/assets/colors.css" rel="stylesheet" />
+
+        <style>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                font-family: "Monda", sans-serif;
+                background: var(--bg);
+                color: var(--text);
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+            nav {
+                background: var(--bg2);
+                border-bottom: 1px solid var(--border);
+                padding: 0 24px;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                height: 56px;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }
+            .logo {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                color: var(--accent);
+                font-weight: 700;
+                font-size: 15px;
+                margin-right: 20px;
+                letter-spacing: 0.5px;
+                text-decoration: none;
+            }
+            .logo-mark {
+                width: 16px;
+                height: 16px;
+                line-height: 1;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .logo-mark svg {
+                width: 16px;
+                height: 16px;
+                stroke: currentColor;
+                fill: none;
+                stroke-width: 1.9;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+            }
+            nav .nav-link {
+                text-decoration: none;
+                color: var(--text-dim);
+                font-family: "Monda", sans-serif;
+                font-size: 13px;
+                padding: 8px 14px;
+                border-radius: 8px;
+                transition: all 0.15s;
+            }
+            nav .nav-link:hover {
+                color: var(--text);
+                background: var(--bg3);
+            }
+            nav .nav-link.active {
+                color: var(--accent);
+                background: var(--accent-dim);
+            }
+            main {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 42px 24px;
+                width: 100%;
+                flex: 1;
+            }
+            footer {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 32px;
+                color: var(--text-dim);
+                background: var(--bg2);
+                border-top: 1px solid var(--border);
+            }
+            h1 {
+                font-size: 30px;
+                margin-bottom: 10px;
+            }
+            p {
+                color: var(--text-dim);
+                margin-bottom: 28px;
+            }
+            .set-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                gap: 16px;
+            }
+            .set-card {
+                display: block;
+                text-decoration: none;
+                color: inherit;
+                padding: 22px;
+                border-radius: 14px;
+                background: var(--bg2);
+                border: 1px solid var(--border);
+                transition: 0.2s;
+            }
+            .set-card:hover {
+                transform: translateY(-2px);
+                border-color: var(--accent);
+                background: var(--bg3);
+            }
+            .set-card h2 {
+                font-size: 17px;
+                margin-bottom: 8px;
+            }
+            .set-card span {
+                color: var(--accent);
+                font-size: 13px;
+            }
+            .set-card p {
+                margin: 10px 0 0;
+                font-size: 13px;
+            }
+        </style>
+    </head>
+    <body>
+        <nav>
+            <a class="logo" href="index.html"
+                ><span class="logo-mark" aria-hidden="true"
+                    ><svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <path d="M3 12h18"></path>
+                        <path d="M12 3a15 15 0 0 1 0 18"></path>
+                        <path d="M12 3a15 15 0 0 0 0 18"></path></svg></span
+                ><span>GlobalQuiz</span></a
+            >
+            <a class="nav-link" href="sets/artists-and-works/index.html"
+                >Artists and Works</a
+            >
+            <a class="nav-link" href="sets/hub-dates/index.html">HUB Dates</a>
+        </nav>
+        <main>
+            <h1>Select a study set</h1>
+            <p>
+                Choose a set to practice with quizzes, speed rounds, flashcards,
+                timeline browse, and matching mode.
+            </p>
+            <div class="set-grid">
+                <a class="set-card" href="sets/artists-and-works/index.html">
+                    <h2>Artists and Works</h2>
+                    <span>AP Euro Art</span>
+                    <p>
+                        Practice artwork titles, artists, eras, and
+                        significance.
+                    </p>
+                </a>
+                <a class="set-card" href="sets/hub-dates/index.html">
+                    <h2>HUB Dates</h2>
+                    <span>European History Milestones</span>
+                    <p>
+                        Practice important events, dates, and historical
+                        significance.
+                    </p>
+                </a>
+            </div>
+        </main>
+        <footer>&copy; 2026 Bryce</footer>
+    </body>
 </html>
