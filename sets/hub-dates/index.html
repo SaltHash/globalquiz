@@ -1142,6 +1142,48 @@
                 margin-bottom: 14px;
                 color: var(--text-dim);
             }
+            .siglab-config {
+                background: var(--bg3);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 12px;
+                margin: 14px 0 16px;
+                display: grid;
+                gap: 10px;
+            }
+            .siglab-config-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+                gap: 10px;
+            }
+            .siglab-config label {
+                font-size: 11px;
+                color: var(--text-dim);
+                text-transform: uppercase;
+                letter-spacing: 0.7px;
+                display: block;
+                margin-bottom: 6px;
+            }
+            .siglab-config input,
+            .siglab-config select {
+                width: 100%;
+                background: var(--bg2);
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                color: var(--text);
+                font-family: "Monda", sans-serif;
+                font-size: 12px;
+                padding: 9px 10px;
+                outline: none;
+            }
+            .siglab-config input:focus,
+            .siglab-config select:focus {
+                border-color: var(--accent);
+            }
+            .siglab-ai-note {
+                font-size: 11px;
+                color: var(--text-dim);
+            }
             .siglab-counter {
                 font-size: 12px;
                 color: var(--text-dim);
@@ -1211,6 +1253,16 @@
                 border-color: var(--accent);
                 background: var(--accent-dim);
                 color: var(--accent);
+            }
+            .siglab-ai-feedback {
+                background: var(--bg3);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                padding: 10px 12px;
+                margin-top: 12px;
+                font-size: 12px;
+                line-height: 1.5;
+                color: var(--text-dim);
             }
 
             /* MODAL */
@@ -2879,13 +2931,69 @@
 
             // ─── SIGNIFICANCE LAB ─────────────────────────────────
             let sigLabState = null;
+            const SIGLAB_MODELS = [
+                "llama-3.3-70b-versatile",
+                "llama-3.1-8b-instant",
+                "deepseek-r1-distill-llama-70b",
+            ];
+            const SIGLAB_DEFAULTS = {
+                gradingMode: "manual",
+                groqApiKey: "",
+                groqModel: SIGLAB_MODELS[0],
+            };
+
+            function getSigLabSettings() {
+                return {
+                    gradingMode:
+                        LS.get("siglab_grading_mode") ||
+                        SIGLAB_DEFAULTS.gradingMode,
+                    groqApiKey:
+                        LS.get("siglab_groq_api_key") ||
+                        SIGLAB_DEFAULTS.groqApiKey,
+                    groqModel:
+                        LS.get("siglab_groq_model") || SIGLAB_DEFAULTS.groqModel,
+                };
+            }
+
+            function saveSigLabSettings(settings) {
+                LS.set("siglab_grading_mode", settings.gradingMode);
+                LS.set("siglab_groq_api_key", settings.groqApiKey);
+                LS.set("siglab_groq_model", settings.groqModel);
+            }
 
             function initSigLab() {
                 sigLabState = null;
+                const settings = getSigLabSettings();
+                const safeApiKey = (settings.groqApiKey || "")
+                    .replace(/&/g, "&amp;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/</g, "&lt;");
                 document.getElementById("siglab-wrapper").innerHTML = `
     <div class="siglab-setup">
-      <h3 style="margin-bottom:8px">Manual Significance Quiz</h3>
-      <p>Type a significance response, use the rubric, and then self-grade with <strong>0, 1, or 2</strong> points per event.</p>
+      <h3 style="margin-bottom:8px">Significance Quiz</h3>
+      <p>Type a significance response, reveal the sample rubric, and then grade with <strong>0, 1, or 2</strong> points per event.</p>
+      <div class="siglab-config">
+        <div class="siglab-config-grid">
+          <div>
+            <label for="siglab-grade-mode">Grading mode</label>
+            <select id="siglab-grade-mode" onchange="updateSigLabSetting('gradingMode', this.value)">
+              <option value="manual" ${settings.gradingMode === "manual" ? "selected" : ""}>Manual self-grade</option>
+              <option value="ai" ${settings.gradingMode === "ai" ? "selected" : ""}>AI grade (Groq)</option>
+            </select>
+          </div>
+          <div>
+            <label for="siglab-groq-model">Groq model</label>
+            <select id="siglab-groq-model" onchange="updateSigLabSetting('groqModel', this.value)">
+              ${SIGLAB_MODELS.map((model) => `<option value="${model}" ${settings.groqModel === model ? "selected" : ""}>${model}</option>`).join("")}
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="siglab-groq-key">Groq API key (stored in local storage)</label>
+          <input id="siglab-groq-key" type="password" autocomplete="off" value="${safeApiKey}" oninput="updateSigLabSetting('groqApiKey', this.value)" placeholder="gsk_..." />
+        </div>
+        <div class="siglab-ai-note">AI grading uses your selected Groq model to assign 0-2 points and explain the score. You can still adjust the score manually before continuing.</div>
+      </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn" onclick="startSigLab(6)">Start 6 Events</button>
         <button class="btn outline" onclick="startSigLab(10)">Start 10 Events</button>
@@ -2896,7 +3004,21 @@
             }
 
             function buildSigLabRound(question) {
-                return { question, answer: "", grade: null, submitted: false };
+                return {
+                    question,
+                    answer: "",
+                    grade: null,
+                    submitted: false,
+                    aiGradingInFlight: false,
+                    aiExplanation: "",
+                    aiError: "",
+                };
+            }
+
+            function updateSigLabSetting(key, value) {
+                const settings = getSigLabSettings();
+                settings[key] = value;
+                saveSigLabSettings(settings);
             }
 
             function startSigLab(n) {
@@ -2923,6 +3045,8 @@
                 const year =
                     round.question.answers.find((a) => a.label === "Year:")
                         ?.correct || "";
+                const settings = getSigLabSettings();
+                const aiMode = settings.gradingMode === "ai";
 
                 document.getElementById("siglab-wrapper").innerHTML = `
     <div class="siglab-card">
@@ -2943,8 +3067,23 @@
       <div class="siglab-grade-grid">
         ${[0, 1, 2].map((score) => `<button class="siglab-grade-btn${round.grade === score ? " selected" : ""}" onclick="setSigLabGrade(${score})" ${!round.submitted ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ""}>${score} / 2</button>`).join("")}
       </div>
+      ${
+          round.submitted
+              ? `<div class="siglab-ai-feedback">${
+                    round.aiGradingInFlight
+                        ? "AI grading in progress..."
+                        : round.aiError
+                          ? `AI grading unavailable: ${round.aiError}`
+                          : round.aiExplanation
+                            ? `<strong>AI feedback:</strong> ${round.aiExplanation}`
+                            : aiMode
+                              ? "No AI feedback yet."
+                              : "Manual grading mode is active."
+                }</div>`
+              : ""
+      }
       <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
-        <button id="siglab-submit-btn" class="btn" onclick="submitSigLabAnswer()" ${round.submitted || !round.answer.trim() ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ""}>Submit Answer</button>
+        <button id="siglab-submit-btn" class="btn" onclick="submitSigLabAnswer()" ${round.submitted || !round.answer.trim() || round.aiGradingInFlight ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ""}>${aiMode ? "Submit for Grading" : "Submit Answer"}</button>
         <button class="btn outline" onclick="nextSigLabRound()" ${!round.submitted || round.grade === null ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ""}>Next</button>
       </div>
     </div>
@@ -2974,7 +3113,104 @@
                 const round = sigLabState.rounds[sigLabState.index];
                 if (round.submitted || !round.answer.trim()) return;
                 round.submitted = true;
+                const settings = getSigLabSettings();
+                if (settings.gradingMode === "ai") {
+                    round.aiGradingInFlight = true;
+                    round.aiExplanation = "";
+                    round.aiError = "";
+                    renderSigLab();
+                    gradeSigLabRoundWithAI(round, settings).finally(() => {
+                        round.aiGradingInFlight = false;
+                        renderSigLab();
+                    });
+                    return;
+                }
                 renderSigLab();
+            }
+
+            async function gradeSigLabRoundWithAI(round, settings) {
+                if (!settings.groqApiKey || !settings.groqApiKey.trim()) {
+                    round.aiError =
+                        "Missing Groq API key. Add it in setup or switch to manual mode.";
+                    return;
+                }
+                const event =
+                    round.question.answers.find((a) => a.label === "Event:")
+                        ?.correct || "Unknown event";
+                const year =
+                    round.question.answers.find((a) => a.label === "Year:")
+                        ?.correct || "Unknown year";
+                const sample = round.question.significanceLong || "";
+                const userAnswer = round.answer.trim();
+                const prompt = `You are grading an AP Euro significance response.
+Event: ${event}
+Year: ${year}
+
+Sample high-quality response:
+${sample}
+
+Student response:
+${userAnswer}
+
+Grade the student on a 0-2 scale:
+- 2 = historically accurate, explains why the event mattered with clear cause/effect or wider impact.
+- 1 = partially correct but vague, incomplete, or missing broader significance.
+- 0 = incorrect, off-topic, or too minimal to show understanding.
+
+Important: the sample is not the only full-credit wording. Different answers can still earn full credit if historically accurate and well-explained.
+
+Return strict JSON only in this format:
+{"score":0|1|2,"feedback":"one short paragraph"} `;
+                try {
+                    const res = await fetch(
+                        "https://api.groq.com/openai/v1/chat/completions",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${settings.groqApiKey.trim()}`,
+                            },
+                            body: JSON.stringify({
+                                model: settings.groqModel || SIGLAB_MODELS[0],
+                                temperature: 0.1,
+                                messages: [
+                                    {
+                                        role: "system",
+                                        content:
+                                            "You are a strict but fair history rubric grader. Return only valid JSON.",
+                                    },
+                                    { role: "user", content: prompt },
+                                ],
+                            }),
+                        },
+                    );
+                    if (!res.ok) {
+                        round.aiError = `HTTP ${res.status}: could not grade response with Groq.`;
+                        return;
+                    }
+                    const data = await res.json();
+                    const content =
+                        data?.choices?.[0]?.message?.content?.trim() || "";
+                    if (!content) {
+                        round.aiError = "Model returned an empty grading response.";
+                        return;
+                    }
+                    const cleaned = content
+                        .replace(/```json/gi, "")
+                        .replace(/```/g, "")
+                        .trim();
+                    const parsed = JSON.parse(cleaned);
+                    if (![0, 1, 2].includes(parsed?.score)) {
+                        round.aiError = "AI grading response had an invalid score.";
+                        return;
+                    }
+                    round.grade = parsed.score;
+                    round.aiExplanation =
+                        parsed.feedback || "Score assigned by AI grader.";
+                } catch (e) {
+                    round.aiError =
+                        "Could not parse AI grading response. You can still grade manually.";
+                }
             }
 
             function nextSigLabRound() {
@@ -2993,10 +3229,14 @@
                 );
                 const maxPoints = rounds.length * 2;
                 const pct = Math.round((totalPoints / maxPoints) * 100);
+                const modeLabel =
+                    getSigLabSettings().gradingMode === "ai"
+                        ? "AI Grading Complete"
+                        : "Manual Grading Complete";
                 saveQuizResult(pct, totalPoints, maxPoints, elapsed);
                 document.getElementById("siglab-wrapper").innerHTML = `
     <div class="siglab-score">
-      <h3 style="margin-bottom:8px">Manual Grading Complete</h3>
+      <h3 style="margin-bottom:8px">${modeLabel}</h3>
       <p>${totalPoints}/${maxPoints} points · ${fmtMs(elapsed)}</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn" onclick="startSigLab(${rounds.length})">Play Again</button>
