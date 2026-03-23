@@ -1760,6 +1760,25 @@
                 const gW = W - pL - pR,
                     gH = H - pT - pB;
                 const pts = hist.slice(-20);
+                const lastPct = pts.length ? pts[pts.length - 1].pct : 0;
+                const theme =
+                    lastPct >= 80
+                        ? {
+                              stroke: "#4ade80",
+                              fillTop: "rgba(74,222,128,0.3)",
+                              fillBottom: "rgba(74,222,128,0)",
+                          }
+                        : lastPct >= 50
+                          ? {
+                                stroke: "#fbbf24",
+                                fillTop: "rgba(251,191,36,0.3)",
+                                fillBottom: "rgba(251,191,36,0)",
+                            }
+                          : {
+                                stroke: "#f87171",
+                                fillTop: "rgba(248,113,113,0.25)",
+                                fillBottom: "rgba(248,113,113,0)",
+                            };
 
                 // grid + labels
                 [0, 25, 50, 75, 100].forEach((v) => {
@@ -1784,8 +1803,8 @@
                 if (pts.length >= 2) {
                     // fill
                     const grad = ctx.createLinearGradient(0, pT, 0, pT + gH);
-                    grad.addColorStop(0, "rgba(155,89,245,0.3)");
-                    grad.addColorStop(1, "rgba(155,89,245,0)");
+                    grad.addColorStop(0, theme.fillTop);
+                    grad.addColorStop(1, theme.fillBottom);
                     ctx.beginPath();
                     pts.forEach((p, i) => {
                         i === 0
@@ -1804,7 +1823,7 @@
                             ? ctx.moveTo(xs(i), ys(p))
                             : ctx.lineTo(xs(i), ys(p));
                     });
-                    ctx.strokeStyle = "#9b59f5";
+                    ctx.strokeStyle = theme.stroke;
                     ctx.lineWidth = 2.5;
                     ctx.lineJoin = "round";
                     ctx.stroke();
@@ -1813,7 +1832,7 @@
                 pts.forEach((p, i) => {
                     ctx.beginPath();
                     ctx.arc(xs(i), ys(p), 3.5, 0, Math.PI * 2);
-                    ctx.fillStyle = "#9b59f5";
+                    ctx.fillStyle = theme.stroke;
                     ctx.fill();
                 });
                 // x-axis date labels (show up to 5)
