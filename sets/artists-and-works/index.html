@@ -2969,17 +2969,36 @@
                 return { question, answer: "", grade: null, submitted: false };
             }
 
-            function startSigLab(n) {
-                const questions = [...quizData]
-                    .sort(() => Math.random() - 0.5)
-                    .slice(0, n)
-                    .map(buildSigLabRound);
+            function escapeSigLabText(text) {
+                return String(text || "")
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#39;");
+            }
+
+            function startSigLabFromQuestions(questions) {
+                const rounds = questions.map(buildSigLabRound);
+                if (!rounds.length) return;
                 sigLabState = {
-                    rounds: questions,
+                    rounds,
                     index: 0,
                     startTime: Date.now(),
                 };
                 renderSigLab();
+            }
+
+            function startSigLabReviewPool(pool) {
+                if (!sigLabState?.reviewPools?.[pool]?.length) return;
+                startSigLabFromQuestions(sigLabState.reviewPools[pool]);
+            }
+
+            function startSigLab(n) {
+                const questions = [...quizData]
+                    .sort(() => Math.random() - 0.5)
+                    .slice(0, n);
+                startSigLabFromQuestions(questions);
             }
 
             function renderSigLab() {
@@ -3072,12 +3091,43 @@
                 );
                 const maxPoints = rounds.length * 2;
                 const pct = Math.round((totalPoints / maxPoints) * 100);
+                const sortedRounds = [...rounds].sort(
+                    (a, b) => (a.grade ?? 0) - (b.grade ?? 0),
+                );
+                const lowScoreQuestions = sortedRounds
+                    .filter((round) => (round.grade ?? 0) <= 1)
+                    .map((round) => round.question);
+                const zeroScoreQuestions = sortedRounds
+                    .filter((round) => (round.grade ?? 0) === 0)
+                    .map((round) => round.question);
+                sigLabState.reviewPools = {
+                    low: lowScoreQuestions,
+                    zero: zeroScoreQuestions,
+                };
                 saveQuizResult(pct, totalPoints, maxPoints, elapsed);
                 document.getElementById("siglab-wrapper").innerHTML = `
     <div class="siglab-score">
       <h3 style="margin-bottom:8px">Manual Grading Complete</h3>
       <p>${totalPoints}/${maxPoints} points · ${fmtMs(elapsed)}</p>
+      <div style="margin:16px 0;padding:14px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);text-align:left">
+        <div style="font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">Your responses (least points → most points)</div>
+        <div style="display:grid;gap:8px">
+          ${sortedRounds
+              .map((round) => {
+                  const work =
+                      round.question.answers.find((a) => a.label === "Name:")
+                          ?.correct || "Unknown work";
+                  const answer = round.answer.trim()
+                      ? escapeSigLabText(round.answer.trim())
+                      : "<em>No response entered.</em>";
+                  return `<div style="padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg3)"><div style="display:flex;justify-content:space-between;gap:10px"><strong>${escapeSigLabText(work)}</strong><span style="color:var(--accent)">${round.grade ?? 0}/2</span></div><div style="margin-top:6px;font-size:12px;color:var(--text-dim)">${answer}</div></div>`;
+              })
+              .join("")}
+        </div>
+      </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" onclick="startSigLabReviewPool('low')" ${!lowScoreQuestions.length ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ""}>Practice all 1/2 and below</button>
+        <button class="btn outline" onclick="startSigLabReviewPool('zero')" ${!zeroScoreQuestions.length ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ""}>Practice all 0/2</button>
         <button class="btn" onclick="startSigLab(${rounds.length})">Play Again</button>
         <button class="btn outline" onclick="initSigLab()">Change Length</button>
       </div>
