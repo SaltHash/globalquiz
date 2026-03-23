@@ -2147,7 +2147,14 @@
                     .normalize("NFD")
                     .replace(/[\u0300-\u036f]/g, "")
                     .toLowerCase()
+                    .replace(/\bthe\b/g, "")
+                    .replace(/\s+/g, "")
                     .trim();
+            }
+
+            function isCaseInsensitiveExact(input, correct) {
+                return (input || "").trim().toLowerCase() ===
+                    (correct || "").trim().toLowerCase();
             }
 
             function levenshteinDistance(a, b) {
@@ -2170,13 +2177,11 @@
                 return dp[b.length];
             }
 
-            function isAnswerNinetyPercentCorrect(input, correct) {
+            function isAnswerCorrect(input, correct) {
                 const user = normalizeAnswerText(input);
                 const expected = normalizeAnswerText(correct);
                 if (!user || !expected) return false;
-                const maxLen = Math.max(user.length, expected.length);
-                const distance = levenshteinDistance(user, expected);
-                return (maxLen - distance) / maxLen >= 0.9;
+                return user === expected;
             }
 
             function submitQuiz() {
@@ -2193,21 +2198,30 @@
                     if (part && !activeParts.has(part.key)) return;
                     if (ans.type === "text-input") {
                         const input = document.getElementById(`qf-${ai}`);
-                        const ok = isAnswerNinetyPercentCorrect(
+                        const ok = isAnswerCorrect(
                             input.value,
                             ans.correct,
                         );
                         input.classList.add(ok ? "correct" : "wrong");
-                        if (!ok) {
-                            allCorrect = false;
+                        const exactCaseInsensitive = isCaseInsensitiveExact(
+                            input.value,
+                            ans.correct,
+                        );
+                        if (!ok || !exactCaseInsensitive) {
+                            if (!ok) allCorrect = false;
                             const hint = document.createElement("div");
                             hint.style.cssText =
                                 "font-size:11px;color:var(--green);margin-top:5px;padding:5px 10px;background:rgba(74,222,128,0.08);border-radius:6px;border-left:2px solid var(--green)";
-                            hint.textContent = "Correct: " + ans.correct;
+                            hint.textContent =
+                                "Technically correct: " + ans.correct;
                             input.parentNode.appendChild(hint);
-                            corrections.push(
-                                ans.label.replace(":", "") + ": " + ans.correct,
-                            );
+                            if (!ok) {
+                                corrections.push(
+                                    ans.label.replace(":", "") +
+                                        ": " +
+                                        ans.correct,
+                                );
+                            }
                         }
                     } else {
                         const sel = document.querySelector(
@@ -3125,7 +3139,6 @@
                 );
                 document.getElementById("match-wrapper").innerHTML = `
                 <div class="match-done">
-                  <div class="hero-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 11 3 7l4-4"></path><path d="M17 11l4-4-4-4"></path><path d="M8 17h8"></path><path d="M12 11v10"></path></svg></div>
                   <h3>All matched!</h3>
                   <div class="time">${elapsed}s</div>
                   <p>${matchState.n} ${getMatchModeLabel(matchState.mode)} pairs · ${elapsed < 30 ? "Blazing fast!" : elapsed < 60 ? "Nice work!" : "Keep practicing!"}</p>
