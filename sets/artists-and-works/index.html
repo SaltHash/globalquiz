@@ -2201,9 +2201,19 @@
                                     "correct",
                                 ),
                             );
-                        const correctBtn = document.querySelector(
+                        let correctBtn = document.querySelector(
                             `.mc-option[data-ai="${ai}"][data-val="${encodeURIComponent(ans.correct)}"]`,
                         );
+                        if (!correctBtn) {
+                            correctBtn = [...document.querySelectorAll(
+                                `.mc-option[data-ai="${ai}"]`,
+                            )].find(
+                                (b) =>
+                                    normalizeAnswerText(
+                                        decodeURIComponent(b.dataset.val),
+                                    ) === normalizeAnswerText(ans.correct),
+                            );
+                        }
                         if (correctBtn) correctBtn.classList.add("selected");
                     }
                 });
@@ -2329,14 +2339,22 @@
                             .forEach((b) => {
                                 b.disabled = true;
                                 if (
-                                    decodeURIComponent(b.dataset.val) ===
-                                    ans.correct
+                                    normalizeAnswerText(
+                                        decodeURIComponent(b.dataset.val),
+                                    ) === normalizeAnswerText(ans.correct)
                                 )
                                     b.classList.add("correct");
                             });
+                        const selectedVal = sel
+                            ? normalizeAnswerText(
+                                  decodeURIComponent(sel.dataset.val),
+                              )
+                            : "";
+                        const correctVal = normalizeAnswerText(ans.correct);
                         if (
                             !sel ||
-                            decodeURIComponent(sel.dataset.val) !== ans.correct
+                            !selectedVal ||
+                            selectedVal !== correctVal
                         ) {
                             allCorrect = false;
                             if (sel) sel.classList.add("wrong");
@@ -2830,13 +2848,19 @@
                 const ai = btn.dataset.ai;
                 const correct = decodeURIComponent(btn.dataset.correct);
                 const val = decodeURIComponent(btn.dataset.val);
-                const isCorrect = val === correct;
+                const normalizedVal = normalizeAnswerText(val);
+                const normalizedCorrect = normalizeAnswerText(correct);
+                const isCorrect = normalizedVal === normalizedCorrect;
 
                 document
                     .querySelectorAll(`.mc-option[data-ai="${ai}"]`)
                     .forEach((b) => {
                         b.disabled = true;
-                        if (decodeURIComponent(b.dataset.val) === correct)
+                        if (
+                            normalizeAnswerText(
+                                decodeURIComponent(b.dataset.val),
+                            ) === normalizedCorrect
+                        )
                             b.classList.add("correct");
                     });
                 if (!isCorrect) {
