@@ -246,6 +246,8 @@
                 stroke-width: 1.8;
                 stroke-linecap: round;
                 stroke-linejoin: round;
+                display: block;
+                overflow: visible;
             }
             .mode-icon {
                 width: 22px;
@@ -2019,7 +2021,7 @@
           <div class="mode-desc">Random questions from all ${total} events</div>
         </button>
         <button class="quiz-mode-btn${quizMode === "wrong" ? " active" : ""}" onclick="setQuizMode('wrong',this)" ${!hasWrong ? 'disabled style="opacity:0.4;cursor:not-allowed"' : ""}>
-          <div class="mode-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M17 1v6h6"></path><path d="M3 11V5h6"></path><path d="M3 5a9 9 0 0 1 15.5-2.5L23 7"></path><path d="M21 19a9 9 0 0 1-15.5 2.5L1 17"></path></svg></div>
+          <div class="mode-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 22a10 10 0 1 1 0-20a10 10 0 0 1 0 20Z"></path><path d="M8 8l8 8M16 8l-8 8"></path></svg></div>
           <div class="mode-name">Wrong Answers Only</div>
           <div class="mode-desc">${hasWrong ? wrongIds.length + " missed from last quiz" : "No missed questions yet"}</div>
         </button>
@@ -2184,6 +2186,57 @@
                 if (fi) fi.focus();
             }
 
+            function autoCorrectQuiz() {
+                const q = quizState.questions[quizState.index];
+                // If the user overrides an incorrect submission, remove this question's
+                // Event from the "wrong answers" pool so it doesn't show up next time.
+                const nameAns = q.answers.find((a) => a.label === "Event:");
+                if (nameAns?.correct) {
+                    quizState.wrongNames = quizState.wrongNames.filter(
+                        (x) => x !== nameAns.correct,
+                    );
+                }
+                const activeParts = new Set(
+                    quizState.parts || QUIZ_PARTS.map((p) => p.key),
+                );
+
+                q.answers.forEach((ans, ai) => {
+                    const part = QUIZ_PARTS.find((p) => p.label === ans.label);
+                    if (
+                        part &&
+                        (!activeParts.has(part.key) ||
+                            q.promptPart === part.key)
+                    )
+                        return;
+
+                    if (ans.type === "text-input") {
+                        const input = document.getElementById(`qf-${ai}`);
+                        if (!input) return;
+                        input.value = ans.correct;
+                        input.classList.remove("wrong", "correct");
+                    } else {
+                        // Clear any selected option and select the correct one.
+                        document
+                            .querySelectorAll(`.mc-option[data-ai="${ai}"]`)
+                            .forEach((b) =>
+                                b.classList.remove(
+                                    "selected",
+                                    "wrong",
+                                    "correct",
+                                ),
+                            );
+                        const correctBtn = document.querySelector(
+                            `.mc-option[data-ai="${ai}"][data-val="${encodeURIComponent(ans.correct)}"]`,
+                        );
+                        if (correctBtn) correctBtn.classList.add("selected");
+                    }
+                });
+
+                // Run the normal grading UI so feedback + highlight works.
+                quizState.submitted = false;
+                submitQuiz();
+            }
+
             function selectMC(btn) {
                 if (quizState.submitted) return;
                 const ai = btn.dataset.ai;
@@ -2194,18 +2247,24 @@
             }
 
             function normalizeAnswerText(text) {
-                return (text || "")
-                    .normalize("NFD")
-                    .replace(/[̀-ͯ]/g, "")
-                    .toLowerCase()
-                    .replace(/\bthe\b/g, "")
-                    .replace(/\s+/g, "")
-                    .trim();
+                return (
+                    (text || "")
+                        // Treat common “smart” punctuation as ASCII equivalents.
+                        .replace(/[’‘‛]/g, "'")
+                        .replace(/[“”]/g, '"')
+                        .normalize("NFD")
+                        .replace(/[̀-ͯ]/g, "")
+                        .toLowerCase()
+                        .replace(/\bthe\b/g, "")
+                        .replace(/\s+/g, "")
+                        .trim()
+                );
             }
 
             function isCaseInsensitiveExact(input, correct) {
-                return (input || "").trim().toLowerCase() ===
-                    (correct || "").trim().toLowerCase();
+                const norm = (s) =>
+                    (s || "").replace(/[’‘‛]/g, "'").trim().toLowerCase();
+                return norm(input) === norm(correct);
             }
 
             function levenshteinDistance(a, b) {
@@ -2228,11 +2287,18 @@
                 return dp[b.length];
             }
 
-            function isAnswerCorrect(input, correct) {
+            function isAnswerCorrect(input, correct, accepted) {
                 const user = normalizeAnswerText(input);
-                const expected = normalizeAnswerText(correct);
-                if (!user || !expected) return false;
-                return user === expected;
+                if (!user) return false;
+
+                const candidates = [correct];
+                if (typeof accepted === "string") candidates.push(accepted);
+                else if (Array.isArray(accepted)) candidates.push(...accepted);
+
+                return candidates
+                    .map((c) => normalizeAnswerText(c))
+                    .filter(Boolean)
+                    .includes(user);
             }
 
             function submitQuiz() {
@@ -2253,14 +2319,22 @@
                         return;
                     if (ans.type === "text-input") {
                         const input = document.getElementById(`qf-${ai}`);
+                        const normalize = (s) =>
+                            s
+                                .replace(/\bthe\b/gi, "")
+                                .replace(/\s+/g, "")
+                                .toLowerCase();
+                        const normalizedInput = normalize(input.value);
+                        const normalizedCorrect = normalize(ans.correct);
                         const ok = isAnswerCorrect(
-                            input.value,
-                            ans.correct,
+                            normalizedInput,
+                            normalizedCorrect,
+                            ans.accepted,
                         );
                         input.classList.add(ok ? "correct" : "wrong");
                         const exactCaseInsensitive = isCaseInsensitiveExact(
-                            input.value,
-                            ans.correct,
+                            normalizedInput,
+                            normalizedCorrect,
                         );
                         if (!ok || !exactCaseInsensitive) {
                             if (!ok) allCorrect = false;
@@ -2305,8 +2379,10 @@
                 fb.textContent = allCorrect
                     ? "Perfect! All correct."
                     : "Some answers were wrong. Correct answers are highlighted in green.";
-                document.getElementById("quiz-actions").innerHTML =
-                    `<button class="btn" onclick="nextQuiz()">Next</button>`;
+                const qa = document.getElementById("quiz-actions");
+                qa.innerHTML = allCorrect
+                    ? `<button class="btn" onclick="nextQuiz()">Next</button>`
+                    : `<button class="btn" onclick="nextQuiz()">Next</button><button class="btn outline" style="margin-left:auto" onclick="autoCorrectQuiz()">Make Answers Correct</button>`;
             }
 
             function nextQuiz() {

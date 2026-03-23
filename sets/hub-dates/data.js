@@ -155,7 +155,7 @@ const quizData = [
   },
   {
     year: "1848",
-    event: "Year of Revolution",
+    event: "Year of Revolution (Earlier)",
     era: "Liberal Revolutions and Unification",
     significanceLong:
       "Across the continent, uprisings exposed the scale of liberal and nationalist demands even where governments reasserted control. The failures still left organizational experience and ideological momentum that shaped later state-building.",
@@ -239,7 +239,7 @@ const quizData = [
   },
   {
     year: "1989",
-    event: "Year of Revolution",
+    event: "Year of Revolution (Later)",
     era: "Cold War",
     significanceLong:
       "Revolutions across the region dismantled one-party rule with remarkable speed and varying local paths. Together they accelerated systemic collapse in a rival sphere and reshaped the ideological map.",
@@ -280,12 +280,35 @@ const quizData = [
     ],
   },
 ].map((item) => {
+  let eventAccepted;
+  if (item.year === "1517") {
+    eventAccepted = ["Luther's 95 Theses"];
+  } else if (item.year === "1848") {
+    // Allow answers without the (Earlier) suffix.
+    eventAccepted = [
+      "Year of Revolution",
+      "Year of Revolution Earlier",
+      "Earlier Year of Revolution",
+    ];
+  } else if (item.year === "1989") {
+    // Allow answers without the (Later) suffix.
+    eventAccepted = [
+      "Year of Revolution",
+      "Year of Revolution Later",
+      "Later Year of Revolution",
+    ];
+  }
   return {
     type: "text",
     prompt: `${item.year} — ${item.event}`,
     era: item.era,
     answers: [
-      { type: "text-input", label: "Event:", correct: item.event },
+      {
+        type: "text-input",
+        label: "Event:",
+        correct: item.event,
+        ...(eventAccepted ? { accepted: eventAccepted } : {}),
+      },
       { type: "text-input", label: "Year:", correct: item.year },
       {
         type: "text-mc",
